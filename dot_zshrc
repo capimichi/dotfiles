@@ -1,0 +1,50 @@
+# ==============================================================================
+# Homebrew (macOS Apple Silicon, macOS Intel, Linuxbrew)
+# ==============================================================================
+if [[ -x "/opt/homebrew/bin/brew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x "/usr/local/bin/brew" ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+elif [[ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# ==============================================================================
+# PATH & Environment Variables (Portabili con $HOME)
+# ==============================================================================
+# User local bin & Python virtualenv
+export PATH="$HOME/.local/bin:$HOME/.venv/bin:$PATH"
+
+# Development & tools
+export PATH="$PATH:$HOME/miniconda3/bin"
+export PATH="$PATH:$HOME/bentosdk/bin"
+export PATH="$PATH:$HOME/N_m3u8DL-RE/bin"
+export PATH="$PATH:$HOME/go/bin"
+
+# Docker Desktop (macOS)
+[[ -d "/Applications/Docker.app/Contents/Resources/bin" ]] && export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"
+
+# Laravel Herd Lite
+if [[ -d "$HOME/.config/herd-lite/bin" ]]; then
+    export PATH="$HOME/.config/herd-lite/bin:$PATH"
+    export PHP_INI_SCAN_DIR="$HOME/.config/herd-lite/bin:$PHP_INI_SCAN_DIR"
+fi
+
+# Antigravity CLI & IDE
+[[ -d "$HOME/.antigravity/antigravity/bin" ]] && export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+[[ -d "$HOME/.antigravity-ide/antigravity-ide/bin" ]] && export PATH="$HOME/.antigravity-ide/antigravity-ide/bin:$PATH"
+
+# ==============================================================================
+# Completions & Shell Features
+# ==============================================================================
+fpath+=~/.zfunc
+autoload -Uz compinit && compinit
+zstyle ':completion:*' menu select
+
+# iTerm2 Shell Integration
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# ==============================================================================
+# Local & Private Configurations (Non versionate)
+# ==============================================================================
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
