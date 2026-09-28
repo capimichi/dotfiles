@@ -1,0 +1,5 @@
+{{- $environments := list "personal" "work" -}}
+{{- $env := promptChoiceOnce . "environment" "Seleziona il tuo ambiente" $environments "personal" -}}
+
+[data]
+    environment = {{ $env | quote }}

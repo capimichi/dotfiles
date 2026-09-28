@@ -1,0 +1,12 @@
+README.md
+.DS_Store
+**/*.local
+.zshrc.local
+
+{{ if ne .environment "personal" }}
+.config/zsh/envs/personal.zsh
+{{ end }}
+
+{{ if ne .environment "work" }}
+.config/zsh/envs/work.zsh
+{{ end }}

@@ -1,0 +1,29 @@
+# ==============================================================================
+# Environment: Personal (MCP & Skills API Credentials da Bitwarden)
+# ==============================================================================
+{{- $paperless := (bitwardenFields "item" "28152e5c-412c-4eb6-a569-b30e011c9890") }}
+export PAPERLESS_BASE_URL="{{ $paperless.base_url.value }}"
+export PAPERLESS_API_KEY="{{ $paperless.api_key.value }}"
+
+{{- $soulsync := (bitwardenFields "item" "9c849f6c-c11a-4f20-94cb-b496015ea8cd") }}
+export SOULSYNC_API_KEY="{{ $soulsync.api_key.value }}"
+
+{{- $stremio := (bitwardenFields "item" "26d507f9-81da-4a15-bf6e-b49500a9ba26") }}
+export STREMIO_EMAIL="capimichi@gmail.com"
+export STREMIO_AUTH_KEY="{{ $stremio.auth_key.value }}"
+
+{{- $trakt := (bitwardenFields "item" "e43c526a-9e7c-44c6-957d-b48b00da3e84") }}
+export TRAKT_CLIENT_ID="{{ $trakt.client_id.value }}"
+export TRAKT_CLIENT_SECRET="{{ $trakt.client_secret.value }}"
+export TRAKT_ACCESS_TOKEN="{{ $trakt.access_token.value }}"
+export TRAKT_REFRESH_TOKEN="{{ $trakt.refresh_token.value }}"
+
+{{- $nuvio := (bitwardenFields "item" "f65045d2-901c-4dac-9273-b46800bbc136") }}
+export NUVIO_BASE_URL="{{ $nuvio.base_url.value }}"
+export NUVIO_API_KEY="{{ $nuvio.api_key.value }}"
+export NUVIO_ACCESS_TOKEN="{{ $nuvio.access_token.value }}"
+export NUVIO_REFRESH_TOKEN="{{ $nuvio.refresh_token.value }}"
+export NUVIO_EMAIL="capimichi@gmail.com"
+
+{{- $listenbrainz := (bitwardenFields "item" "92faa347-7210-4226-b6b8-b49a00a09631") }}
+export LISTENBRAINZ_TOKEN="{{ $listenbrainz.user_token.value }}"
