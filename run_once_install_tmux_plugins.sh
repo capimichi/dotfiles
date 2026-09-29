@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-PLUGINS_DIR="$HOME/.tmux/plugins"
+PLUGINS_DIR="$HOME/.config/tmux/plugins"
 CONF="$HOME/.config/tmux/tmux.conf"
 
 mkdir -p "$PLUGINS_DIR"
