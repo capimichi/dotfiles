@@ -1,6 +1,10 @@
 [user]
-	name = Michele Capichioni
+	name = Michele Capicchioni
+{{- if eq .environment "work" }}
+	email = michele.capicchioni@thespacesm.com
+{{- else }}
 	email = capimichi@gmail.com
+{{- end }}
 [core]
 	autocrlf = input
 [credential]

@@ -1,16 +1,16 @@
 #!/bin/bash
 set -euo pipefail
 
-TPM_DIR="$HOME/.tmux/plugins/tpm"
+PLUGINS_DIR="$HOME/.tmux/plugins"
+CONF="$HOME/.config/tmux/tmux.conf"
 
-# 1. Clona TPM se non esiste
-if [ ! -d "$TPM_DIR" ]; then
-    echo "==> Clonazione Tmux Plugin Manager (TPM)..."
-    git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
-fi
+mkdir -p "$PLUGINS_DIR"
 
-# 2. Installa automaticamente i plugin definiti nel tmux.conf
-if [ -f "$TPM_DIR/bin/install_plugins" ]; then
-    echo "==> Installazione plugin tmux in corso..."
-    "$TPM_DIR/bin/install_plugins"
-fi
+# Clona ogni plugin dichiarato con "set -g @plugin 'user/repo'" (non serve un server tmux attivo)
+grep -oE "@plugin '[^']+'" "$CONF" | sed -E "s/@plugin '([^']+)'/\1/" | while read -r repo; do
+    dest="$PLUGINS_DIR/$(basename "$repo")"
+    if [ ! -d "$dest" ]; then
+        echo "==> Clonazione $repo..."
+        git clone --depth 1 "https://github.com/$repo" "$dest"
+    fi
+done

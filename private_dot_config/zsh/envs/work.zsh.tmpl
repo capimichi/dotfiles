@@ -2,3 +2,6 @@
 # Environment: Work
 # Inserisci qui le configurazioni, proxy o token specifici per il lavoro
 # ==============================================================================
+{{- $cloudflare := (bitwardenFields "item" "ff64c8b1-df9c-4917-8f05-333bfbd3c09a") }}
+export CF_API_TOKEN="{{ index $cloudflare "API Token" "value" }}"
+export CLOUDFLARE_API_TOKEN="{{ index $cloudflare "API Token" "value" }}"
