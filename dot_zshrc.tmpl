@@ -55,6 +55,13 @@ zstyle ':completion:*' menu select
 # iTerm2 Shell Integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+# ==============================================
+# Zoxide (Smarter cd command)
+# ==============================================
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init zsh)"
+fi
+
 # ==============================================================================
 # Local & Private Configurations (Non versionate)
 # ==============================================================================
