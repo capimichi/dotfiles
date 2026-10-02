@@ -28,6 +28,7 @@ export NUVIO_EMAIL="capimichi@gmail.com"
 {{- $listenbrainz := (bitwardenFields "item" "92faa347-7210-4226-b6b8-b49a00a09631") }}
 export LISTENBRAINZ_TOKEN="{{ $listenbrainz.user_token.value }}"
 
+# GitHub Token (Scadenza: 2 ottobre 2027)
 {{- $github := (bitwardenFields "item" "cd77fd0d-ed9c-497f-9b78-b27b0094a7c4") }}
 export GITHUB_TOKEN="{{ (index $github "PERSONAL TOKEN").value }}"
 export GH_TOKEN="$GITHUB_TOKEN"
