@@ -25,12 +25,14 @@ Uno dei principi cardine di questa configurazione è l'**adesione rigorosa allo 
 
 ---
 
-## 🏢 Gestione Multi-Ambiente (`personal` vs `work`)
+## 🏢 Gestione Multi-Ambiente (`personal` vs `work` vs `server`)
 
 All'inizializzazione (`chezmoi init`), un prompt interattivo memorizza l'ambiente della macchina in locale (`~/.config/chezmoi/chezmoi.toml`):
 
-* **`personal`**: abilita l'integrazione con Bitwarden per estrarre in modo sicuro token e credenziali per API e skill personali (Paperless, Stremio, Nuvio, Trakt, SoulSync, ListenBrainz) dentro `~/.config/zsh/envs/personal.zsh`.
+* **`personal`**: abilita l'integrazione con Bitwarden per estrarre in modo sicuro token e credenziali per API e skill personali (Paperless, Stremio, Nuvio, Trakt, SoulSync, ListenBrainz, GitHub) dentro `~/.config/zsh/envs/personal.zsh`.
 * **`work`**: esclude totalmente il vault Bitwarden personale tramite `.chezmoiignore` e carica unicamente le impostazioni lavorative da `~/.config/zsh/envs/work.zsh`.
+* **`server`**: esclude ogni integrazione Bitwarden, token e credenziali. Installa configurazioni headless/CLI (Tmux con Dracula, Neovim, Bash, Zsh, Git) escludendo utility grafiche macOS (`Ghostty`, `Karabiner`).
+
 
 ---
 
@@ -50,4 +52,4 @@ Per configurare una nuova macchina da zero con un singolo comando:
 chezmoi init --apply capimichi
 ```
 
-Chezmoi chiederà l'ambiente (`personal` / `work`), clonerà la configurazione e installerà automaticamente plugin e tool necessari.
+Chezmoi chiederà l'ambiente (`personal` / `work` / `server`), clonerà la configurazione e installerà automaticamente plugin e tool necessari.

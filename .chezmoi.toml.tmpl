@@ -1,4 +1,4 @@
-{{- $environments := list "personal" "work" -}}
+{{- $environments := list "personal" "work" "server" -}}
 {{- $env := promptChoiceOnce . "environment" "Seleziona il tuo ambiente" $environments "personal" -}}
 
 [data]

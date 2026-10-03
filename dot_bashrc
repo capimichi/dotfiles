@@ -1,0 +1,63 @@
+# ==============================================================================
+# Bash Configuration (Managed by Chezmoi)
+# ==============================================================================
+# Se la shell non è interattiva, non fare nulla
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+# Impostazioni cronologia
+HISTCONTROL=ignoreboth
+shopt -s histappend
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# Aggiorna dimensione finestra dopo ogni comando
+shopt -s checkwinsize
+
+# Prompt colorato
+if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    color_prompt=yes
+else
+    color_prompt=
+fi
+
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt
+
+# Supporto colori per ls e grep
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# Alias standard
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# ==============================================================================
+# PATH & Environment Variables (Portabili con $HOME)
+# ==============================================================================
+# User local bin & Python virtualenv
+export PATH="$HOME/.local/bin:$HOME/.venv/bin:$PATH"
+
+# Zoxide (se installato)
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init bash)"
+fi
+
+# ==============================================================================
+# Local & Private Configurations (Non versionate)
+# ==============================================================================
+if [ -f "$HOME/.bashrc.local" ]; then
+    . "$HOME/.bashrc.local"
+fi
