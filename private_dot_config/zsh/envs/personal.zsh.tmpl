@@ -33,9 +33,11 @@ export LISTENBRAINZ_TOKEN="{{ $listenbrainz.user_token.value }}"
 export GITHUB_TOKEN="{{ (index $github "PERSONAL TOKEN").value }}"
 export GH_TOKEN="$GITHUB_TOKEN"
 
-# Cloudflare Token
+# Cloudflare Token & Account
 {{- $cloudflare := (bitwardenFields "item" "e1d66fc0-753c-4361-830f-b15d014f4cc2") }}
 export CF_API_TOKEN="{{ (index $cloudflare "API TOKEN").value }}"
 export CLOUDFLARE_API_TOKEN="$CF_API_TOKEN"
+export CLOUDFLARE_ACCOUNT_ID="{{ (index $cloudflare "ACCOUNT ID").value }}"
+export CF_ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID"
 
 
