@@ -20,3 +20,9 @@ shell_type = unix
 {{- if eq .environment "work" }}
 # Configurazione remotes per l'ambiente work
 {{- end }}
+
+{{- /* Inclusione remotes locali non versionati */ -}}
+{{- $localConf := joinPath .chezmoi.homeDir ".config/rclone/rclone.conf.local" -}}
+{{- if stat $localConf }}
+{{ include $localConf }}
+{{- end }}
