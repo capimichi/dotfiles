@@ -1,0 +1,27 @@
+#!/bin/bash
+# .tmux.conf hash: {{ include "private_dot_config/tmux/tmux.conf" | sha256sum }}
+set -euo pipefail
+
+PLUGINS_DIR="$HOME/.config/tmux/plugins"
+CONF="$HOME/.config/tmux/tmux.conf"
+
+mkdir -p "$PLUGINS_DIR"
+
+# Clona ogni plugin dichiarato con "set -g @plugin 'user/repo'" (non serve un server tmux attivo)
+grep -oE "@plugin '[^']+'" "$CONF" | sed -E "s/@plugin '([^']+)'/\1/" | while read -r repo; do
+    dest="$PLUGINS_DIR/$(basename "$repo")"
+    if [ ! -d "$dest/.git" ]; then
+        echo "==> Clonazione $repo (con submoduli)..."
+        if [ -d "$dest" ]; then
+            tmp_clone="$(mktemp -d)"
+            git clone --depth 1 --recurse-submodules "https://github.com/$repo" "$tmp_clone"
+            cp -R "$tmp_clone/." "$dest/"
+            rm -rf "$tmp_clone"
+        else
+            git clone --depth 1 --recurse-submodules "https://github.com/$repo" "$dest"
+        fi
+    else
+        # Assicura che i submoduli siano aggiornati/inizializzati
+        git -C "$dest" submodule update --init --recursive 2>/dev/null || true
+    fi
+done
