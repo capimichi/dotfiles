@@ -63,24 +63,24 @@ if command -v zoxide &> /dev/null; then
 fi
 
 # ==============================================
-# fzf (Ctrl+R cronologia, Ctrl+T file, **<Tab> completamento)
+# fzf: solo Ctrl+R (cronologia). La ricerca ricorsiva si lancia a mano, es. cd "$(fzf --walker dir)"
 # ==============================================
 if command -v fzf &> /dev/null; then
     if fzf --zsh &> /dev/null; then
-        # Il walker integrato parte dalla cartella corrente: niente link simbolici (in ~/Library/Containers
-        # moltiplicano le stesse cartelle) e salta le directory enormi che non si cercano mai a mano
-        FZF_WALKER_SKIP=".git,node_modules,vendor,Library,.Trash,.cache,.npm,.pub-cache,.rustup"
-        export FZF_CTRL_T_OPTS="--walker file,dir,hidden --walker-skip $FZF_WALKER_SKIP"
-        export FZF_ALT_C_OPTS="--walker dir,hidden --walker-skip $FZF_WALKER_SKIP"
-        export FZF_COMPLETION_PATH_OPTS="--walker file,dir,hidden --walker-skip $FZF_WALKER_SKIP"
-        export FZF_COMPLETION_DIR_OPTS="--walker dir,hidden --walker-skip $FZF_WALKER_SKIP"
+        # Per fzf lanciato a mano: salta le directory enormi che non si cercano mai
+        export FZF_DEFAULT_OPTS="--walker-skip .git,node_modules,vendor,Library,.Trash,.cache,.npm,.pub-cache,.rustup"
         source <(fzf --zsh)
     else
-        # fzf < 0.48 (pacchetti delle distro) non ha --zsh: usa gli script distribuiti col pacchetto
-        for fzf_file in /usr/share/doc/fzf/examples/{key-bindings,completion}.zsh /usr/share/fzf/{key-bindings,completion}.zsh; do
+        # fzf < 0.48 (pacchetti delle distro) non ha --zsh: usa lo script distribuito col pacchetto
+        for fzf_file in /usr/share/doc/fzf/examples/key-bindings.zsh /usr/share/fzf/key-bindings.zsh; do
             [[ -f "$fzf_file" ]] && source "$fzf_file"
         done
     fi
+    # Via la ricerca ricorsiva automatica: Ctrl+T, Alt+C e **<Tab> (il Tab torna al completamento di prima)
+    for fzf_keymap in emacs viins vicmd; do
+        bindkey -M $fzf_keymap -r '^T' '\ec'
+        (( ${+fzf_default_completion} )) && bindkey -M $fzf_keymap '^I' "$fzf_default_completion"
+    done
 fi
 
 # ==============================================================================
