@@ -25,22 +25,3 @@ grep -oE "@plugin '[^']+'" "$CONF" | sed -E "s/@plugin '([^']+)'/\1/" | while re
         git -C "$dest" submodule update --init --recursive 2>/dev/null || true
     fi
 done
-
-# tmux-fingers richiede un binario: lo scarichiamo dalla release invece di passare dal wizard interattivo
-FINGERS_DIR="$PLUGINS_DIR/tmux-fingers"
-if [ -d "$FINGERS_DIR" ] && [ ! -x "$FINGERS_DIR/bin/tmux-fingers" ] && ! command -v tmux-fingers >/dev/null 2>&1; then
-    case "$(uname -s)-$(uname -m)" in
-        Darwin-arm64) suffix="macos-arm64" ;;
-        Linux-x86_64) suffix="linux-x86_64" ;;
-        *) suffix="" ;;
-    esac
-    if [ -n "$suffix" ]; then
-        version="$(grep '^version' "$FINGERS_DIR/shard.yml" | cut -d: -f2 | tr -d ' ')"
-        echo "==> Download binario tmux-fingers $version ($suffix)..."
-        mkdir -p "$FINGERS_DIR/bin"
-        curl -fsSL "https://github.com/Morantron/tmux-fingers/releases/download/$version/tmux-fingers-$version-$suffix" -o "$FINGERS_DIR/bin/tmux-fingers"
-        chmod +x "$FINGERS_DIR/bin/tmux-fingers"
-    else
-        echo "==> Nessun binario tmux-fingers per $(uname -s) $(uname -m): installalo con il wizard (prefix + I)"
-    fi
-fi
