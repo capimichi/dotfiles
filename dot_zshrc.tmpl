@@ -67,8 +67,6 @@ fi
 # ==============================================
 if command -v fzf &> /dev/null; then
     if fzf --zsh &> /dev/null; then
-        # Per fzf lanciato a mano: salta le directory enormi che non si cercano mai
-        export FZF_DEFAULT_OPTS="--walker-skip .git,node_modules,vendor,Library,.Trash,.cache,.npm,.pub-cache,.rustup"
         source <(fzf --zsh)
     else
         # fzf < 0.48 (pacchetti delle distro) non ha --zsh: usa lo script distribuito col pacchetto
