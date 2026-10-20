@@ -51,18 +51,7 @@ fi
 fpath+=~/.zfunc
 autoload -Uz compinit && compinit
 
-# fzf-tab: il menu del Tab diventa fzf (serve fzf; va caricato dopo compinit)
-FZF_TAB_DIR="$HOME/.local/share/zsh/plugins/fzf-tab"
-if command -v fzf &> /dev/null && [[ -f "$FZF_TAB_DIR/fzf-tab.plugin.zsh" ]]; then
-    zstyle ':completion:*' menu no
-    zstyle ':completion:*:descriptions' format '[%d]'
-    zstyle ':completion:*:git-checkout:*' sort false
-    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls -1 $realpath'
-    zstyle ':fzf-tab:*' switch-group '<' '>'
-    source "$FZF_TAB_DIR/fzf-tab.plugin.zsh"
-else
-    zstyle ':completion:*' menu select
-fi
+zstyle ':completion:*' menu select
 
 # iTerm2 Shell Integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
@@ -75,21 +64,23 @@ if command -v zoxide &> /dev/null; then
 fi
 
 # ==============================================
-# fzf: solo Ctrl+R (cronologia). La ricerca ricorsiva si lancia a mano, es. cd "$(fzf --walker dir)"
+# fzf: Ctrl+R (cronologia) e completamento on-demand (**<Tab>)
 # ==============================================
 if command -v fzf &> /dev/null; then
     if fzf --zsh &> /dev/null; then
         source <(fzf --zsh)
     else
-        # fzf < 0.48 (pacchetti delle distro) non ha --zsh: usa lo script distribuito col pacchetto
+        # fzf < 0.48 (pacchetti delle distro) non ha --zsh: usa gli script distribuiti col pacchetto
         for fzf_file in /usr/share/doc/fzf/examples/key-bindings.zsh /usr/share/fzf/key-bindings.zsh; do
             [[ -f "$fzf_file" ]] && source "$fzf_file"
         done
+        for fzf_comp in /usr/share/doc/fzf/examples/completion.zsh /usr/share/fzf/completion.zsh; do
+            [[ -f "$fzf_comp" ]] && source "$fzf_comp"
+        done
     fi
-    # Via la ricerca ricorsiva automatica: Ctrl+T, Alt+C e **<Tab> (il Tab torna al completamento di prima)
+    # Disabilita scorciatoie ricorsive automatiche (Ctrl+T e Alt+C) per evitare scansioni pesanti dell'intera home
     for fzf_keymap in emacs viins vicmd; do
         bindkey -M $fzf_keymap -r '^T' '\ec'
-        (( ${+fzf_default_completion} )) && bindkey -M $fzf_keymap '^I' "$fzf_default_completion"
     done
 fi
 
