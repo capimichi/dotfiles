@@ -62,6 +62,20 @@ if command -v zoxide &> /dev/null; then
     eval "$(zoxide init zsh)"
 fi
 
+# ==============================================
+# fzf (Ctrl+R cronologia, Ctrl+T file, **<Tab> completamento)
+# ==============================================
+if command -v fzf &> /dev/null; then
+    if fzf --zsh &> /dev/null; then
+        source <(fzf --zsh)
+    else
+        # fzf < 0.48 (pacchetti delle distro) non ha --zsh: usa gli script distribuiti col pacchetto
+        for fzf_file in /usr/share/doc/fzf/examples/{key-bindings,completion}.zsh /usr/share/fzf/{key-bindings,completion}.zsh; do
+            [[ -f "$fzf_file" ]] && source "$fzf_file"
+        done
+    fi
+fi
+
 # ==============================================================================
 # Local & Private Configurations (Non versionate)
 # ==============================================================================
