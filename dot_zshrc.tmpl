@@ -50,7 +50,19 @@ fi
 # ==============================================================================
 fpath+=~/.zfunc
 autoload -Uz compinit && compinit
-zstyle ':completion:*' menu select
+
+# fzf-tab: il menu del Tab diventa fzf (serve fzf; va caricato dopo compinit)
+FZF_TAB_DIR="$HOME/.local/share/zsh/plugins/fzf-tab"
+if command -v fzf &> /dev/null && [[ -f "$FZF_TAB_DIR/fzf-tab.plugin.zsh" ]]; then
+    zstyle ':completion:*' menu no
+    zstyle ':completion:*:descriptions' format '[%d]'
+    zstyle ':completion:*:git-checkout:*' sort false
+    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls -1 $realpath'
+    zstyle ':fzf-tab:*' switch-group '<' '>'
+    source "$FZF_TAB_DIR/fzf-tab.plugin.zsh"
+else
+    zstyle ':completion:*' menu select
+fi
 
 # iTerm2 Shell Integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
