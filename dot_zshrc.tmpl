@@ -67,6 +67,13 @@ fi
 # ==============================================
 if command -v fzf &> /dev/null; then
     if fzf --zsh &> /dev/null; then
+        # Il walker integrato parte dalla cartella corrente: niente link simbolici (in ~/Library/Containers
+        # moltiplicano le stesse cartelle) e salta le directory enormi che non si cercano mai a mano
+        FZF_WALKER_SKIP=".git,node_modules,vendor,Library,.Trash,.cache,.npm,.pub-cache,.rustup"
+        export FZF_CTRL_T_OPTS="--walker file,dir,hidden --walker-skip $FZF_WALKER_SKIP"
+        export FZF_ALT_C_OPTS="--walker dir,hidden --walker-skip $FZF_WALKER_SKIP"
+        export FZF_COMPLETION_PATH_OPTS="--walker file,dir,hidden --walker-skip $FZF_WALKER_SKIP"
+        export FZF_COMPLETION_DIR_OPTS="--walker dir,hidden --walker-skip $FZF_WALKER_SKIP"
         source <(fzf --zsh)
     else
         # fzf < 0.48 (pacchetti delle distro) non ha --zsh: usa gli script distribuiti col pacchetto
