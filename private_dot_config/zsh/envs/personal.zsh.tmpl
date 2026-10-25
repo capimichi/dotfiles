@@ -44,6 +44,3 @@ export CF_ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID"
 {{- $huggingface := (bitwardenFields "item" "ebc5f808-ebe0-4f1b-8242-b2ac01653d21") }}
 export HF_TOKEN="{{ (index $huggingface "CLI TOKEN").value }}"
 export HUGGING_FACE_HUB_TOKEN="$HF_TOKEN"
-
-
-
