@@ -12,7 +12,8 @@ README.md
 
 {{ if ne .environment "work" }}
 .config/zsh/envs/work.zsh
-.config/hostinger/token
+.config/hostinger
+.config/hostinger/**
 {{ end }}
 
 {{ if eq .environment "server" }}
