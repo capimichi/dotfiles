@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ $# -lt 1 ]; then
+  echo "Uso: rclone-nfs-mount <remote>[:] [extra rclone...]" >&2
+  echo "Es:  rclone-nfs-mount vivafarmacia.it.prod:  ->  ~/.local/mnt/vivafarmacia.it.prod" >&2
+  echo "Default: --vfs-cache-mode full --vfs-cache-max-size 10G --vfs-cache-max-age 24h (sovrascrivibili)" >&2
+  echo "Smonta con: umount ~/.local/mnt/<remote>" >&2
+  exit 1
+fi
+
+remote="${1%:}"
+shift
+
+mnt="$HOME/.local/mnt/${remote}"
+
+if ! rclone listremotes 2>/dev/null | grep -xF "${remote}:" >/dev/null; then
+  echo "Remote '${remote}:' non trovato in rclone.conf" >&2
+  exit 1
+fi
+
+if mount | grep -F " on ${mnt} (" >/dev/null; then
+  echo "Gia' montato: $mnt" >&2
+  exit 1
+fi
+
+mkdir -p "$mnt"
+# Defaults first: options passed on the command line come later and win
+exec rclone nfsmount "${remote}:" "$mnt" \
+  --vfs-cache-mode full \
+  --vfs-cache-max-size 10G \
+  --vfs-cache-max-age 24h \
+  --daemon \
+  "$@"
