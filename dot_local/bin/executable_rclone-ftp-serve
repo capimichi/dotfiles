@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+state="$HOME/.local/state/rclone-ftp"
+
+usage() {
+  echo "Uso: rclone-ftp-serve <remote>[:] [extra rclone...]" >&2
+  echo "     rclone-ftp-serve --stop <remote>[:]" >&2
+  echo "     rclone-ftp-serve --list" >&2
+  echo "Es:  rclone-ftp-serve vivafarmacia.it.prod:  ->  ftp://127.0.0.1:2123" >&2
+  echo "Porta: la prima libera da 2123 in su; solo su 127.0.0.1, accesso anonimo" >&2
+  echo "Default: --vfs-cache-mode full --vfs-cache-max-size 10G --vfs-cache-max-age 24h (sovrascrivibili)" >&2
+  exit 1
+}
+
+# Running pid for a remote, or nothing; stale state files are cleaned up
+running_pid() {
+  local pidfile="$state/$1.pid"
+  [ -f "$pidfile" ] || return 1
+  local pid
+  pid="$(cat "$pidfile")"
+  if kill -0 "$pid" 2>/dev/null; then
+    echo "$pid"
+  else
+    rm -f "$pidfile" "$state/$1.port"
+    return 1
+  fi
+}
+
+[ $# -lt 1 ] && usage
+
+case "$1" in
+  --list)
+    found=0
+    for f in "$state"/*.pid; do
+      [ -e "$f" ] || continue
+      r="$(basename "$f" .pid)"
+      if pid="$(running_pid "$r")"; then
+        printf '%-40s ftp://127.0.0.1:%s  (pid %s)\n' "${r}:" "$(cat "$state/$r.port")" "$pid"
+        found=1
+      fi
+    done
+    [ "$found" = 1 ] || echo "Nessun remote servito" >&2
+    exit 0
+    ;;
+  --stop)
+    [ $# -lt 2 ] && usage
+    r="${2%:}"
+    if ! pid="$(running_pid "$r")"; then
+      echo "'${r}:' non e' servito" >&2
+      exit 1
+    fi
+    kill "$pid"
+    rm -f "$state/$r.pid" "$state/$r.port"
+    echo "Fermato ${r}: (pid $pid)"
+    exit 0
+    ;;
+  -*)
+    usage
+    ;;
+esac
+
+remote="${1%:}"
+shift
+
+if ! rclone listremotes 2>/dev/null | grep -xF "${remote}:" >/dev/null; then
+  echo "Remote '${remote}:' non trovato in rclone.conf" >&2
+  exit 1
+fi
+
+mkdir -p "$state"
+pidfile="$state/${remote}.pid"
+portfile="$state/${remote}.port"
+logfile="$state/${remote}.log"
+
+if pid="$(running_pid "$remote")"; then
+  echo "Gia' servito: ftp://127.0.0.1:$(cat "$portfile") (pid $pid)" >&2
+  exit 1
+fi
+
+port=2123
+while lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; do
+  port=$((port + 1))
+done
+
+# Defaults first: options passed on the command line come later and win
+nohup rclone serve ftp "${remote}:" \
+  --addr "127.0.0.1:${port}" \
+  --vfs-cache-mode full \
+  --vfs-cache-max-size 10G \
+  --vfs-cache-max-age 24h \
+  --log-file "$logfile" \
+  "$@" >/dev/null 2>&1 &
+pid=$!
+
+sleep 1
+if ! kill -0 "$pid" 2>/dev/null; then
+  echo "rclone e' uscito subito, vedi $logfile" >&2
+  exit 1
+fi
+
+echo "$pid" >"$pidfile"
+echo "$port" >"$portfile"
+echo "ftp://127.0.0.1:${port}  (pid $pid, log $logfile)"
