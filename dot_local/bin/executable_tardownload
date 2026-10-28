@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -ne 3 ]]; then
+  echo "Uso: $0 <host> <dir_remota> <dir_locale>"
+  exit 1
+fi
+
+HOST="$1"
+REMOTE_DIR="$2"
+LOCAL_DIR="$3"
+
+mkdir -p "$LOCAL_DIR"
+
+# Calcolo dimensione remota (in bytes)
+size=$(ssh "$HOST" "cd \"$REMOTE_DIR\" && du -sb . | awk '{print \$1}'")
+
+if [[ -z "${size// }" ]]; then
+  echo "Errore: impossibile calcolare la dimensione remota"
+  exit 1
+fi
+
+echo "Dimensione stimata: $size bytes"
+
+# Trasferimento con progress bar
+ssh "$HOST" "cd \"$REMOTE_DIR\" && tar cf - ." \
+  | pv -s "$size" \
+  | tar xf - -C "$LOCAL_DIR"
