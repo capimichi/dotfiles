@@ -4,10 +4,11 @@ set -euo pipefail
 state="$HOME/.local/state/rclone-ftp"
 
 usage() {
-  echo "Uso: rclone-ftp-serve <remote>[:] [extra rclone...]" >&2
+  echo "Uso: rclone-ftp-serve <remote>[:] [--daemon] [extra rclone...]" >&2
   echo "     rclone-ftp-serve --stop <remote>[:]" >&2
   echo "     rclone-ftp-serve --list" >&2
   echo "Es:  rclone-ftp-serve vivafarmacia.it.prod:  ->  ftp://127.0.0.1:2123" >&2
+  echo "Senza --daemon resta nel terminale (Ctrl+C per fermare); con --daemon va in background, log in $state" >&2
   echo "Porta: la prima libera da 2123 in su; solo su 127.0.0.1, accesso anonimo" >&2
   echo "Default: --vfs-cache-mode full --vfs-cache-max-size 10G --vfs-cache-max-age 24h (sovrascrivibili)" >&2
   exit 1
@@ -83,14 +84,33 @@ while lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; do
   port=$((port + 1))
 done
 
+# rclone serve has no --daemon: take it out of the args and handle it here
+daemon=0
+args=()
+for a in "$@"; do
+  case "$a" in
+    --daemon | --daemon=true) daemon=1 ;;
+    --daemon=false) daemon=0 ;;
+    *) args+=("$a") ;;
+  esac
+done
+
 # Defaults first: options passed on the command line come later and win
-nohup rclone serve ftp "${remote}:" \
-  --addr "127.0.0.1:${port}" \
-  --vfs-cache-mode full \
-  --vfs-cache-max-size 10G \
-  --vfs-cache-max-age 24h \
-  --log-file "$logfile" \
-  "$@" >/dev/null 2>&1 &
+cmd=(rclone serve ftp "${remote}:"
+  --addr "127.0.0.1:${port}"
+  --vfs-cache-mode full
+  --vfs-cache-max-size 10G
+  --vfs-cache-max-age 24h)
+
+if [ "$daemon" = 0 ]; then
+  echo "ftp://127.0.0.1:${port}  (Ctrl+C per fermare)" >&2
+  # exec keeps the pid, so --list sees it; the stale pidfile is cleaned up later
+  echo "$$" >"$pidfile"
+  echo "$port" >"$portfile"
+  exec "${cmd[@]}" ${args[@]+"${args[@]}"}
+fi
+
+nohup "${cmd[@]}" --log-file "$logfile" ${args[@]+"${args[@]}"} >/dev/null 2>&1 &
 pid=$!
 
 sleep 1

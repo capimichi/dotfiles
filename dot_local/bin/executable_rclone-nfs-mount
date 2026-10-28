@@ -2,8 +2,9 @@
 set -euo pipefail
 
 if [ $# -lt 1 ]; then
-  echo "Uso: rclone-nfs-mount <remote>[:] [extra rclone...]" >&2
+  echo "Uso: rclone-nfs-mount <remote>[:] [--daemon] [extra rclone...]" >&2
   echo "Es:  rclone-nfs-mount vivafarmacia.it.prod:  ->  ~/.local/mnt/vivafarmacia.it.prod" >&2
+  echo "Senza --daemon resta nel terminale (Ctrl+C smonta); con --daemon va in background" >&2
   echo "Default: --vfs-cache-mode full --vfs-cache-max-size 10G --vfs-cache-max-age 24h (sovrascrivibili)" >&2
   echo "Smonta con: umount ~/.local/mnt/<remote>" >&2
   exit 1
@@ -30,5 +31,4 @@ exec rclone nfsmount "${remote}:" "$mnt" \
   --vfs-cache-mode full \
   --vfs-cache-max-size 10G \
   --vfs-cache-max-age 24h \
-  --daemon \
   "$@"
