@@ -2,18 +2,32 @@
 set -euo pipefail
 
 if [ $# -lt 1 ]; then
-  echo "Uso: rclone-nfs-mount <remote>[:] [--daemon] [extra rclone...]" >&2
+  echo "Uso: rclone-nfs-mount <remote>[:path] [--daemon] [extra rclone...]" >&2
   echo "Es:  rclone-nfs-mount vivafarmacia.it.prod:  ->  ~/.local/mnt/vivafarmacia.it.prod" >&2
+  echo "     rclone-nfs-mount aleimport.it:/srv/www  ->  ~/.local/mnt/aleimport.it_srv_www" >&2
   echo "Senza --daemon resta nel terminale (Ctrl+C smonta); con --daemon va in background" >&2
   echo "Default: --vfs-cache-mode full --vfs-cache-max-size 10G --vfs-cache-max-age 24h (sovrascrivibili)" >&2
-  echo "Smonta con: umount ~/.local/mnt/<remote>" >&2
+  echo "Smonta con: umount ~/.local/mnt/<nome>" >&2
   exit 1
 fi
 
-remote="${1%:}"
+# Split <remote>[:path] into remote, path and the mountpoint name:
+# aleimport.it: -> aleimport.it, aleimport.it:/srv/www -> aleimport.it_srv_www, aleimport.it:/ -> aleimport.it_root
+remote="${1%%:*}"
+path=""
+[[ "$1" == *:* ]] && path="${1#*:}"
+if [ -z "$path" ]; then
+  name="$remote"
+elif [ "$path" = "/" ]; then
+  name="${remote}_root"
+else
+  p="${path#/}"
+  p="${p%/}"
+  name="${remote}_${p//\//_}"
+fi
 shift
 
-mnt="$HOME/.local/mnt/${remote}"
+mnt="$HOME/.local/mnt/${name}"
 
 if ! rclone listremotes 2>/dev/null | grep -xF "${remote}:" >/dev/null; then
   echo "Remote '${remote}:' non trovato in rclone.conf" >&2
@@ -27,7 +41,7 @@ fi
 
 mkdir -p "$mnt"
 # Defaults first: options passed on the command line come later and win
-exec rclone nfsmount "${remote}:" "$mnt" \
+exec rclone nfsmount "${remote}:${path}" "$mnt" \
   --vfs-cache-mode full \
   --vfs-cache-max-size 10G \
   --vfs-cache-max-age 24h \

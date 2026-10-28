@@ -4,17 +4,35 @@ set -euo pipefail
 state="$HOME/.local/state/rclone-ftp"
 
 usage() {
-  echo "Uso: rclone-ftp-serve <remote>[:] [--daemon] [extra rclone...]" >&2
-  echo "     rclone-ftp-serve --stop <remote>[:]" >&2
+  echo "Uso: rclone-ftp-serve <remote>[:path] [--daemon] [extra rclone...]" >&2
+  echo "     rclone-ftp-serve --stop <remote>[:path]" >&2
   echo "     rclone-ftp-serve --list" >&2
   echo "Es:  rclone-ftp-serve vivafarmacia.it.prod:  ->  ftp://127.0.0.1:2123" >&2
+  echo "     rclone-ftp-serve aleimport.it:/srv/www  (path assoluto; senza / e' relativo alla root del remote)" >&2
   echo "Senza --daemon resta nel terminale (Ctrl+C per fermare); con --daemon va in background, log in $state" >&2
   echo "Porta: la prima libera da 2123 in su; solo su 127.0.0.1, accesso anonimo" >&2
   echo "Default: --vfs-cache-mode full --vfs-cache-max-size 10G --vfs-cache-max-age 24h (sovrascrivibili)" >&2
   exit 1
 }
 
-# Running pid for a remote, or nothing; stale state files are cleaned up
+# Split <remote>[:path] into remote, path and name (used for the state files):
+# aleimport.it: -> aleimport.it, aleimport.it:/srv/www -> aleimport.it_srv_www, aleimport.it:/ -> aleimport.it_root
+parse_spec() {
+  remote="${1%%:*}"
+  path=""
+  [[ "$1" == *:* ]] && path="${1#*:}"
+  if [ -z "$path" ]; then
+    name="$remote"
+  elif [ "$path" = "/" ]; then
+    name="${remote}_root"
+  else
+    local p="${path#/}"
+    p="${p%/}"
+    name="${remote}_${p//\//_}"
+  fi
+}
+
+# Running pid for a name, or nothing; stale state files are cleaned up
 running_pid() {
   local pidfile="$state/$1.pid"
   [ -f "$pidfile" ] || return 1
@@ -23,7 +41,7 @@ running_pid() {
   if kill -0 "$pid" 2>/dev/null; then
     echo "$pid"
   else
-    rm -f "$pidfile" "$state/$1.port"
+    rm -f "$pidfile" "$state/$1.port" "$state/$1.spec"
     return 1
   fi
 }
@@ -35,9 +53,10 @@ case "$1" in
     found=0
     for f in "$state"/*.pid; do
       [ -e "$f" ] || continue
-      r="$(basename "$f" .pid)"
-      if pid="$(running_pid "$r")"; then
-        printf '%-40s ftp://127.0.0.1:%s  (pid %s)\n' "${r}:" "$(cat "$state/$r.port")" "$pid"
+      n="$(basename "$f" .pid)"
+      if pid="$(running_pid "$n")"; then
+        spec="$(cat "$state/$n.spec" 2>/dev/null || echo "${n}:")"
+        printf '%-40s ftp://127.0.0.1:%s  (pid %s)\n' "$spec" "$(cat "$state/$n.port")" "$pid"
         found=1
       fi
     done
@@ -46,14 +65,14 @@ case "$1" in
     ;;
   --stop)
     [ $# -lt 2 ] && usage
-    r="${2%:}"
-    if ! pid="$(running_pid "$r")"; then
-      echo "'${r}:' non e' servito" >&2
+    parse_spec "$2"
+    if ! pid="$(running_pid "$name")"; then
+      echo "'$2' non e' servito" >&2
       exit 1
     fi
     kill "$pid"
-    rm -f "$state/$r.pid" "$state/$r.port"
-    echo "Fermato ${r}: (pid $pid)"
+    rm -f "$state/$name.pid" "$state/$name.port" "$state/$name.spec"
+    echo "Fermato $2 (pid $pid)"
     exit 0
     ;;
   -*)
@@ -61,7 +80,7 @@ case "$1" in
     ;;
 esac
 
-remote="${1%:}"
+parse_spec "$1"
 shift
 
 if ! rclone listremotes 2>/dev/null | grep -xF "${remote}:" >/dev/null; then
@@ -70,11 +89,12 @@ if ! rclone listremotes 2>/dev/null | grep -xF "${remote}:" >/dev/null; then
 fi
 
 mkdir -p "$state"
-pidfile="$state/${remote}.pid"
-portfile="$state/${remote}.port"
-logfile="$state/${remote}.log"
+pidfile="$state/${name}.pid"
+portfile="$state/${name}.port"
+specfile="$state/${name}.spec"
+logfile="$state/${name}.log"
 
-if pid="$(running_pid "$remote")"; then
+if pid="$(running_pid "$name")"; then
   echo "Gia' servito: ftp://127.0.0.1:$(cat "$portfile") (pid $pid)" >&2
   exit 1
 fi
@@ -96,7 +116,7 @@ for a in "$@"; do
 done
 
 # Defaults first: options passed on the command line come later and win
-cmd=(rclone serve ftp "${remote}:"
+cmd=(rclone serve ftp "${remote}:${path}"
   --addr "127.0.0.1:${port}"
   --vfs-cache-mode full
   --vfs-cache-max-size 10G
@@ -107,6 +127,7 @@ if [ "$daemon" = 0 ]; then
   # exec keeps the pid, so --list sees it; the stale pidfile is cleaned up later
   echo "$$" >"$pidfile"
   echo "$port" >"$portfile"
+  echo "${remote}:${path}" >"$specfile"
   exec "${cmd[@]}" ${args[@]+"${args[@]}"}
 fi
 
@@ -121,4 +142,5 @@ fi
 
 echo "$pid" >"$pidfile"
 echo "$port" >"$portfile"
+echo "${remote}:${path}" >"$specfile"
 echo "ftp://127.0.0.1:${port}  (pid $pid, log $logfile)"
