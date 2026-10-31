@@ -20,7 +20,7 @@ source = maildir://{{ $.chezmoi.homeDir }}/.local/share/mail/{{ $item.login.user
 default = INBOX
 check-mail = 5m
 check-mail-cmd = mbsync {{ $item.login.username }}
-check-mail-timeout = 60s
+check-mail-timeout = 5m
 {{- if eq $fields.imap_host.value "imap.gmail.com" }}
 postpone = [Gmail]/Bozze
 {{- else if eq $fields.imap_host.value "imap.mail.yahoo.com" }}
