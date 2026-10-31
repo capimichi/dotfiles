@@ -1,0 +1,26 @@
+# ==============================================================================
+# Mail Accounts Data (Bitwarden UUID mappings for chezmoi mail clients)
+# ==============================================================================
+
+[mail.personal]
+accounts = [
+  { id = "c187fb6f-47da-4188-a810-b41f014d857b", default = true, displayName = "Michele Capicchioni" },
+  { id = "b819d71c-f66b-4737-9dbb-b15d014f4cc2", default = false, displayName = "Michele Capicchioni" },
+  { id = "d56a5344-f4d7-4b70-a4fa-b3960156f623", default = false, displayName = "Michele Capicchioni" },
+  { id = "d384b166-9177-44ed-992c-b37a0089703c", default = false, displayName = "Michele Capicchioni" },
+  { id = "6517afc4-b32c-4c99-88d2-b451013b4698", default = false, displayName = "Michele Capicchioni" },
+  { id = "8019a03b-3028-4603-b815-b42e006e1864", default = false, displayName = "Michele Capicchioni" },
+  { id = "31867e30-cea7-40a4-b8ca-b4d8009799e7", default = false, displayName = "Michele Capicchioni" }
+]
+
+[mail.work]
+accounts = [
+  { id = "cd46075d-7e3d-47ad-9830-b4f300da2048", default = true, displayName = "Michele Capicchioni" },
+  { id = "c7903d29-5b84-4cbc-a82a-b4f300da22b8", default = false, displayName = "Assistenza The Space" },
+  { id = "82ca892d-0b7d-4681-ba49-b4f300da24f5", default = false, displayName = "The Space" },
+  { id = "bfa40619-e138-45a1-a62d-b4f300da2731", default = false, displayName = "Hostmaster The Space" }
+]
+
+[mail.server]
+accounts = []
+

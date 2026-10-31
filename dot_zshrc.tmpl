@@ -10,6 +10,17 @@ elif [[ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
 fi
 
 # ==============================================================================
+# XDG Base Directory Specification
+# ==============================================================================
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+# Cyrus SASL Plugin Path (for mbsync XOAUTH2 support)
+export SASL_PATH="$HOME/.local/lib/sasl2:/usr/lib/sasl2"
+
+# ==============================================================================
 # PATH & Environment Variables (Portabili con $HOME)
 # ==============================================================================
 # User local bin & Python virtualenv
@@ -82,6 +93,17 @@ if command -v fzf &> /dev/null; then
     for fzf_keymap in emacs viins vicmd; do
         bindkey -M $fzf_keymap -r '^T' '\ec'
     done
+fi
+
+# ==============================================================================
+# Tmux: Fix soft-wrap selections in terminal emulators (Ghostty/Alacritty/iTerm2)
+# ==============================================================================
+if [[ -n "$TMUX" ]]; then
+    autoload -Uz add-zsh-hook
+    tmux_fix_soft_wrap_selections() {
+        tmux refresh
+    }
+    add-zsh-hook precmd tmux_fix_soft_wrap_selections
 fi
 
 # ==============================================================================

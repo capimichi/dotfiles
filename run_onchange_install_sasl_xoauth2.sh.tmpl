@@ -1,0 +1,31 @@
+#!/bin/bash
+{{ if eq .chezmoi.os "darwin" -}}
+# mbsyncrc hash: {{ include "private_dot_mbsyncrc.tmpl" | sha256sum }}
+set -euo pipefail
+
+DEST_DIR="$HOME/.local/lib/sasl2"
+DEST_FILE="$DEST_DIR/libxoauth2.so"
+
+if [ ! -f "$DEST_FILE" ]; then
+    echo "==> Compilazione modulo cyrus-sasl-xoauth2 per mbsync..."
+    TMP_DIR="$(mktemp -d)"
+    git clone --depth 1 https://github.com/moriyoshi/cyrus-sasl-xoauth2.git "$TMP_DIR"
+    mkdir -p "$DEST_DIR"
+
+    SDK_PATH="$(xcrun --show-sdk-path 2>/dev/null || echo "")"
+    INC_OPT=""
+    if [ -n "$SDK_PATH" ]; then
+        INC_OPT="-I$SDK_PATH/usr/include"
+    fi
+
+    clang -bundle -fPIC $INC_OPT -lsasl2 \
+        "$TMP_DIR/xoauth2_client.c" \
+        "$TMP_DIR/xoauth2_init.c" \
+        "$TMP_DIR/xoauth2_server.c" \
+        "$TMP_DIR/xoauth2_str.c" \
+        -o "$DEST_FILE"
+
+    rm -rf "$TMP_DIR"
+    echo "==> cyrus-sasl-xoauth2 installato con successo in $DEST_FILE"
+fi
+{{ end -}}

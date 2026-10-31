@@ -18,6 +18,11 @@ README.md
 
 {{ if eq .environment "server" }}
 .config/ghostty
+.config/aerc
+.config/aerc/**
+.config/himalaya
+.config/himalaya/**
+.mbsyncrc
 {{ end }}
 
 {{ if ne .chezmoi.os "darwin" }}

@@ -1,9 +1,12 @@
 # ==============================================================================
 # Environment: Personal (MCP & Skills API Credentials da Bitwarden)
 # ==============================================================================
+# Paperless-ngx (Bitwarden: "paperless.michelecapicchioni.com capimichi")
 {{- $paperless := (bitwardenFields "item" "28152e5c-412c-4eb6-a569-b30e011c9890") }}
 export PAPERLESS_BASE_URL="{{ $paperless.base_url.value }}"
 export PAPERLESS_API_KEY="{{ $paperless.api_key.value }}"
+export PAPERLESS_URL="$PAPERLESS_BASE_URL"
+export PAPERLESS_TOKEN="$PAPERLESS_API_KEY"
 
 {{- $soulsync := (bitwardenFields "item" "9c849f6c-c11a-4f20-94cb-b496015ea8cd") }}
 export SOULSYNC_API_KEY="{{ $soulsync.api_key.value }}"
