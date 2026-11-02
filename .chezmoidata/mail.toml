@@ -2,6 +2,10 @@
 # Mail Accounts Data (Bitwarden UUID mappings for chezmoi mail clients)
 # ==============================================================================
 
+# Backend di default per i singoli account aerc ("notmuch" o "maildir")
+[mail]
+default_backend = "notmuch"
+
 [mail.personal]
 accounts = [
   { id = "c187fb6f-47da-4188-a810-b41f014d857b", default = true, displayName = "Michele Capicchioni" },
@@ -23,4 +27,3 @@ accounts = [
 
 [mail.server]
 accounts = []
-

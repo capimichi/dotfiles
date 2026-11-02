@@ -12,6 +12,9 @@ export SASL_PATH="$HOME/.local/lib/sasl2:/usr/lib/sasl2"
 
 export PATH="$HOME/.local/bin:$PATH"
 
+# aerc mail backend default ("notmuch" or "maildir")
+export AERC_MAIL_BACKEND="${AERC_MAIL_BACKEND:-notmuch}"
+
 # JetBrains Toolbox
 [[ -d "$HOME/Library/Application Support/JetBrains/Toolbox/scripts" ]] && export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 

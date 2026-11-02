@@ -1,0 +1,20 @@
+#!/bin/bash
+# ==============================================================================
+# Safe Maildir & Notmuch Sync Script for aerc
+# ==============================================================================
+set -euo pipefail
+
+# Ensure SASL plugin path is set for XOAUTH2 (Hotmail, Outlook, Office365)
+export SASL_PATH="${SASL_PATH:-$HOME/.local/lib/sasl2:/usr/lib/sasl2}"
+
+# Prevent concurrent mbsync/notmuch runs using an atomic directory lock
+LOCK_DIR="/tmp/mail-sync.lockdir"
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+    # Another sync is already in progress, exit quietly
+    exit 0
+fi
+trap 'rm -rf "$LOCK_DIR"' EXIT INT TERM
+
+TARGET="${1:-all}"
+mbsync "$TARGET" || true
+notmuch new

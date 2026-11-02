@@ -1,5 +1,10 @@
 {{- $environments := list "personal" "work" "server" -}}
 {{- $env := promptChoiceOnce . "environment" "Seleziona il tuo ambiente" $environments "personal" -}}
+{{- $mail_backend := "notmuch" -}}
+{{- if hasKey . "mail_backend" -}}
+  {{- $mail_backend = .mail_backend -}}
+{{- end -}}
 
 [data]
     environment = {{ $env | quote }}
+    mail_backend = {{ $mail_backend | quote }}
