@@ -22,15 +22,23 @@
     {{- $password = (replace " " "" $fields.app_password.value) }}
   {{- end }}
 {{- end }}
+{{- $accBackend := $backend }}
+{{- if hasKey $acc "backend" }}
+  {{- $accBackend = $acc.backend }}
+{{- end }}
 
 [{{ $item.login.username }}]
 from = {{ $acc.displayName | quote }} <{{ $item.login.username }}>
-{{- if eq $backend "notmuch" }}
+{{- if eq $accBackend "notmuch" }}
 source = notmuch://
 maildir-account-path = {{ $item.login.username }}
 enable-maildir = true
 multi-file-strategy = act-all
 check-mail-cmd = {{ $.chezmoi.homeDir }}/.local/bin/sync-mail {{ $item.login.username }}
+{{- else if eq $accBackend "imap" }}
+source = {{ if eq $fields.imap_encryption.value "tls" }}imaps{{ else }}imap{{ end }}://{{ $item.login.username | urlquery }}:{{ $password | urlquery }}@{{ $fields.imap_host.value }}
+cache-headers = true
+check-mail = 5m
 {{- else }}
 source = maildir://{{ $.chezmoi.homeDir }}/.local/share/mail/{{ $item.login.username }}
 check-mail = 5m
