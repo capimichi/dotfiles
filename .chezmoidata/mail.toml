@@ -4,7 +4,7 @@
 
 # Backend di default per i singoli account aerc ("notmuch" o "maildir")
 [mail]
-default_backend = "notmuch"
+default_backend = "maildir"
 
 [mail.personal]
 accounts = [

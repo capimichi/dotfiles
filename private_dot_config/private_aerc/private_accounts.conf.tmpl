@@ -3,7 +3,7 @@
 # ==============================================================================
 {{- $env := .environment }}
 {{- $mailConfig := index .mail $env }}
-{{- $backend := "notmuch" }}
+{{- $backend := "maildir" }}
 {{- if hasKey . "mail_backend" }}
   {{- $backend = .mail_backend }}
 {{- else if hasKey .mail "default_backend" }}
@@ -12,59 +12,6 @@
 {{- if (env "AERC_MAIL_BACKEND") }}
   {{- $backend = (env "AERC_MAIL_BACKEND") }}
 {{- end }}
-{{- $allEmails := list }}
-{{- $defaultItem := "" }}
-{{- $defaultAcc := "" }}
-{{- $defaultFields := "" }}
-
-{{- range $acc := $mailConfig.accounts }}
-  {{- $item := (bitwarden "item" $acc.id) }}
-  {{- $allEmails = append $allEmails $item.login.username }}
-  {{- if $acc.default }}
-    {{- $defaultItem = $item }}
-    {{- $defaultAcc = $acc }}
-    {{- $defaultFields = (bitwardenFields "item" $acc.id) }}
-  {{- end }}
-{{- end }}
-{{- if not $defaultItem }}
-  {{- if gt (len $mailConfig.accounts) 0 }}
-    {{- $acc := index $mailConfig.accounts 0 }}
-    {{- $defaultItem = (bitwarden "item" $acc.id) }}
-    {{- $defaultAcc = $acc }}
-    {{- $defaultFields = (bitwardenFields "item" $acc.id) }}
-  {{- end }}
-{{- end }}
-
-multi-file-strategy = act-all
-
-{{- if $defaultItem }}
-[All]
-from = {{ $defaultAcc.displayName | quote }} <{{ $defaultItem.login.username }}>
-source = notmuch://
-query-map = {{ $.chezmoi.homeDir }}/.config/aerc/notmuch-all.map
-check-mail = 5m
-check-mail-cmd = {{ $.chezmoi.homeDir }}/.local/bin/sync-mail all
-check-mail-timeout = 5m
-enable-maildir = true
-multi-file-strategy = act-all
-default = Inbox
-folders = Inbox, Unread, Starred, Sent, Drafts, Archive, Spam, Trash
-folders-sort = Inbox, Unread, Starred, Sent, Drafts, Archive, Spam, Trash
-aliases = {{ range $i, $e := $allEmails }}{{ if $i }}, {{ end }}{{ $e }}{{ end }}
-{{- $defaultPassword := $defaultItem.login.password }}
-{{- if hasKey $defaultFields "app_password" }}
-  {{- if $defaultFields.app_password.value }}
-    {{- $defaultPassword = (replace " " "" $defaultFields.app_password.value) }}
-  {{- end }}
-{{- end }}
-{{- if or (eq $defaultFields.imap_host.value "outlook.office365.com") (eq $defaultFields.imap_host.value "imap-mail.outlook.com") }}
-outgoing = smtp+xoauth2://{{ $defaultItem.login.username | urlquery }}@{{ $defaultFields.smtp_host.value }}:{{ $defaultFields.smtp_port.value }}
-outgoing-cred-cmd = {{ $.chezmoi.homeDir }}/.local/bin/mutt_oauth2.py {{ $.chezmoi.homeDir }}/.local/state/email/{{ $defaultItem.login.username }}.tokens
-{{- else }}
-outgoing = {{ if eq $defaultFields.smtp_encryption.value "tls" }}smtps{{ else }}smtp{{ end }}://{{ $defaultItem.login.username | urlquery }}:{{ $defaultPassword | urlquery }}@{{ $defaultFields.smtp_host.value }}:{{ $defaultFields.smtp_port.value }}
-{{- end }}
-
-{{ end -}}
 
 {{- range $acc := $mailConfig.accounts }}
 {{- $item := (bitwarden "item" $acc.id) }}
