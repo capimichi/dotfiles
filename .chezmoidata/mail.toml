@@ -4,11 +4,11 @@
 
 # Backend di default per i singoli account aerc ("notmuch" o "maildir")
 [mail]
-default_backend = "maildir"
+default_backend = "notmuch"
 
 [mail.personal]
 accounts = [
-  { id = "c187fb6f-47da-4188-a810-b41f014d857b", default = true, displayName = "Michele Capicchioni", backend = "imap" },
+  { id = "c187fb6f-47da-4188-a810-b41f014d857b", default = true, displayName = "Michele Capicchioni" },
   { id = "b819d71c-f66b-4737-9dbb-b15d014f4cc2", default = false, displayName = "Michele Capicchioni" },
   { id = "d56a5344-f4d7-4b70-a4fa-b3960156f623", default = false, displayName = "Michele Capicchioni" },
   { id = "d384b166-9177-44ed-992c-b37a0089703c", default = false, displayName = "Michele Capicchioni" },
