@@ -31,8 +31,14 @@ dirlist*.selected.italic=false
 statusline_default.bg=#303030
 statusline_error.fg=red
 
-msglist_unread.fg=#ffffff
+msglist_unread.fg=#50FA7B
 msglist_unread.bold=true
+msglist_unread.selected.fg=#50FA7B
+msglist_unread.selected.bold=true
+msglist_read.fg=#A0A8CD
+msglist_read.bold=false
+dirlist_unread.fg=#50FA7B
+dirlist_unread.bold=true
 msglist_deleted.fg=#666666
 msglist_*.selected.bg=#44475A
 msglist_result.bg=#6272A4
