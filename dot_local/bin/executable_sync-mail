@@ -7,14 +7,35 @@ set -euo pipefail
 # Ensure SASL plugin path is set for XOAUTH2 (Hotmail, Outlook, Office365)
 export SASL_PATH="${SASL_PATH:-$HOME/.local/lib/sasl2:/usr/lib/sasl2}"
 
-# Prevent concurrent mbsync/notmuch runs using an atomic directory lock
+# Prevent concurrent mbsync/notmuch runs using an atomic directory lock with stale-lock detection
 LOCK_DIR="/tmp/mail-sync.lockdir"
+PID_FILE="$LOCK_DIR/pid"
+
 if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-    # Another sync is already in progress, exit quietly
-    exit 0
+    IS_STALE=false
+    if [ -f "$PID_FILE" ]; then
+        PID=$(cat "$PID_FILE" 2>/dev/null || true)
+        if [ -n "$PID" ] && kill -0 "$PID" 2>/dev/null; then
+            # Sync is actively running by another process
+            exit 0
+        fi
+        IS_STALE=true
+    else
+        IS_STALE=true
+    fi
+
+    if [ "$IS_STALE" = true ]; then
+        rm -rf "$LOCK_DIR"
+        if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+            exit 0
+        fi
+    fi
 fi
+echo "$$" > "$PID_FILE"
 trap 'rm -rf "$LOCK_DIR"' EXIT INT TERM
 
 TARGET="${1:-all}"
 mbsync "$TARGET" || true
 notmuch new
+notmuch tag +spam -unread -- 'folder:/Spam/ or folder:/Junk/ or folder:/Bulk/' 2>/dev/null || true
+notmuch tag +trash -unread -- 'folder:/Trash/ or folder:/Deleted/ or folder:/Cestino/' 2>/dev/null || true
