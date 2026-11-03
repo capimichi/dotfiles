@@ -48,7 +48,11 @@ Inbox ~/.local/share/mail/{{ $item.login.username }}/INBOX
 Channel {{ $item.login.username }}
 Far :{{ $item.login.username }}-remote:
 Near :{{ $item.login.username }}-local:
+{{- if eq $fields.imap_host.value "imap.gmail.com" }}
+Patterns * !"[Gmail]/Tutti i messaggi" !"[Gmail]/Importanti" !"[Gmail]/All Mail" !"[Gmail]/Important"
+{{- else }}
 Patterns *
+{{- end }}
 Create Both
 Expunge Both
 CopyArrivalDate yes
