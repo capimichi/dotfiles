@@ -48,6 +48,7 @@ check-mail-timeout = 5m
 enable-maildir = true
 multi-file-strategy = act-all
 default = Inbox
+postpone = Drafts
 folders = Inbox, Unread, Starred, Sent, Drafts, Archive, Spam, Trash
 folders-sort = Inbox, Unread, Starred, Sent, Drafts, Archive, Spam, Trash
 aliases = {{ range $i, $e := $allEmails }}{{ if $i }}, {{ end }}{{ $e }}{{ end }}
@@ -83,6 +84,7 @@ source = notmuch://
 maildir-account-path = {{ $item.login.username }}
 enable-maildir = true
 multi-file-strategy = act-all
+check-mail = 2m
 check-mail-cmd = {{ $.chezmoi.homeDir }}/.local/bin/sync-mail {{ $item.login.username }}
 {{- else }}
 source = maildir://{{ $.chezmoi.homeDir }}/.local/share/mail/{{ $item.login.username }}
