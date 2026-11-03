@@ -7,35 +7,31 @@ set -euo pipefail
 # Ensure SASL plugin path is set for XOAUTH2 (Hotmail, Outlook, Office365)
 export SASL_PATH="${SASL_PATH:-$HOME/.local/lib/sasl2:/usr/lib/sasl2}"
 
-# Prevent concurrent mbsync/notmuch runs using an atomic directory lock with stale-lock detection
-LOCK_DIR="/tmp/mail-sync.lockdir"
-PID_FILE="$LOCK_DIR/pid"
-
-if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-    IS_STALE=false
-    if [ -f "$PID_FILE" ]; then
-        PID=$(cat "$PID_FILE" 2>/dev/null || true)
-        if [ -n "$PID" ] && kill -0 "$PID" 2>/dev/null; then
-            # Sync is actively running by another process
-            exit 0
-        fi
-        IS_STALE=true
-    else
-        IS_STALE=true
-    fi
-
-    if [ "$IS_STALE" = true ]; then
-        rm -rf "$LOCK_DIR"
-        if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-            exit 0
-        fi
-    fi
+# ------------------------------------------------------------------------------
+# Kernel-level File Descriptor Lock via flock
+# ------------------------------------------------------------------------------
+# Automatically released by the OS kernel if process finishes, crashes, or is killed.
+LOCK_FILE="/tmp/mail-sync.lock"
+exec 200>"$LOCK_FILE"
+if ! flock -n 200; then
+    # Another sync is actively in progress, exit quietly
+    exit 0
 fi
-echo "$$" > "$PID_FILE"
-trap 'rm -rf "$LOCK_DIR"' EXIT INT TERM
 
+# ------------------------------------------------------------------------------
+# Synchronization Pipeline
+# ------------------------------------------------------------------------------
 TARGET="${1:-all}"
 mbsync "$TARGET" || true
 notmuch new
 notmuch tag +spam -unread -- 'folder:/Spam/ or folder:/Junk/ or folder:/Bulk/' 2>/dev/null || true
 notmuch tag +trash -unread -- 'folder:/Trash/ or folder:/Deleted/ or folder:/Cestino/' 2>/dev/null || true
+
+# ------------------------------------------------------------------------------
+# Notify aerc via macOS FSEvents
+# ------------------------------------------------------------------------------
+# Stock aerc watches ~/.local/share/mail/.notmuch/xapian/ with FSEvents (WatchRoot).
+# A directory entry creation/deletion triggers the native FSEvent, waking up
+# aerc to reload Notmuch without needing any binary patch or custom build.
+SENTINEL="${MAIL_DIR:-$HOME/.local/share/mail}/.notmuch/xapian/.aerc-sync"
+rm -f "$SENTINEL" 2>/dev/null || true; touch "$SENTINEL" 2>/dev/null || true; rm -f "$SENTINEL" 2>/dev/null || true
