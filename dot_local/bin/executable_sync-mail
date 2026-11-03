@@ -12,8 +12,8 @@ export SASL_PATH="${SASL_PATH:-$HOME/.local/lib/sasl2:/usr/lib/sasl2}"
 # ------------------------------------------------------------------------------
 # Automatically released by the OS kernel if process finishes, crashes, or is killed.
 LOCK_FILE="/tmp/mail-sync.lock"
-exec 200>"$LOCK_FILE"
-if ! flock -n 200; then
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
     # Another sync is actively in progress, exit quietly
     exit 0
 fi
