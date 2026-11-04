@@ -1,0 +1,4 @@
+{{ if ne .environment "server" }}
+# Legacy mbsync config, now managed as ~/.config/isyncrc (XDG)
+.mbsyncrc
+{{ end }}

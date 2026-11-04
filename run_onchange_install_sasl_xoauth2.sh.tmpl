@@ -1,6 +1,6 @@
 #!/bin/bash
 {{ if eq .chezmoi.os "darwin" -}}
-# mbsyncrc hash: {{ include "private_dot_mbsyncrc.tmpl" | sha256sum }}
+# isyncrc hash: {{ include "private_dot_config/isyncrc.tmpl" | sha256sum }}
 set -euo pipefail
 
 DEST_DIR="$HOME/.local/lib/sasl2"
