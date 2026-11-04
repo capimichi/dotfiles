@@ -22,7 +22,7 @@ README.md
 .config/aerc/**
 .config/himalaya
 .config/himalaya/**
-.mbsyncrc
+.config/isyncrc
 {{ end }}
 
 {{ if ne .chezmoi.os "darwin" }}
