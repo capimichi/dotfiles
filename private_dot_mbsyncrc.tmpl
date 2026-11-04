@@ -36,8 +36,8 @@ TLSType IMAPS
 TLSType STARTTLS
 {{- end }}
 CertificateFile {{ if eq $.chezmoi.os "darwin" }}/etc/ssl/cert.pem{{ else }}/etc/ssl/certs/ca-certificates.crt{{ end }}
-Timeout 120
-PipelineDepth 10
+Timeout 600
+PipelineDepth 2
 
 IMAPStore {{ $item.login.username }}-remote
 Account {{ $item.login.username }}
