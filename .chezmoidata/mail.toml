@@ -19,10 +19,7 @@ accounts = [
 
 [mail.work]
 accounts = [
-  { id = "cd46075d-7e3d-47ad-9830-b4f300da2048", default = true, displayName = "Michele Capicchioni" },
-  { id = "c7903d29-5b84-4cbc-a82a-b4f300da22b8", default = false, displayName = "Assistenza The Space" },
-  { id = "82ca892d-0b7d-4681-ba49-b4f300da24f5", default = false, displayName = "The Space" },
-  { id = "bfa40619-e138-45a1-a62d-b4f300da2731", default = false, displayName = "Hostmaster The Space" }
+  { id = "a62f775f-5199-4ceb-9a83-eb6f4ca618ce", default = true, displayName = "Michele Capicchioni" }
 ]
 
 [mail.server]
