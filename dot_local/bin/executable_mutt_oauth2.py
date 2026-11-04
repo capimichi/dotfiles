@@ -135,6 +135,9 @@ if not token:
     token['authflow'] = input('Preferred OAuth2 flow ("authcode" or "localhostauthcode" '
                               'or "devicecode"): ')
     token['email'] = input('Account e-mail address: ')
+    if not registrations.get(token['registration'], {}).get('client_id'):
+        token['client_id'] = input('OAuth2 client_id: ')
+        token['client_secret'] = input('OAuth2 client_secret: ')
     token['access_token'] = ''
     token['access_token_expiration'] = ''
     token['refresh_token'] = ''
@@ -144,6 +147,10 @@ if token['registration'] not in registrations:
     sys.exit(f'ERROR: Unknown registration "{token["registration"]}". Delete token file '
              f'and start over.')
 registration = registrations[token['registration']]
+# client_id/client_secret salvati nel token file prevalgono su quelli registrati
+for key in ('client_id', 'client_secret'):
+    if token.get(key):
+        registration[key] = token[key]
 
 authflow = token['authflow']
 if args.authflow:

@@ -58,8 +58,10 @@ aliases = {{ range $i, $e := $allEmails }}{{ if $i }}, {{ end }}{{ $e }}{{ end }
     {{- $defaultPassword = (replace " " "" $defaultFields.app_password.value) }}
   {{- end }}
 {{- end }}
-{{- if or (eq $defaultFields.imap_host.value "outlook.office365.com") (eq $defaultFields.imap_host.value "imap-mail.outlook.com") }}
-outgoing = smtp+xoauth2://{{ $defaultItem.login.username | urlquery }}@{{ $defaultFields.smtp_host.value }}:{{ $defaultFields.smtp_port.value }}
+{{- $oauth := or (eq $defaultFields.imap_host.value "outlook.office365.com") (eq $defaultFields.imap_host.value "imap-mail.outlook.com") }}
+{{- if hasKey $defaultFields "auth" }}{{ if eq $defaultFields.auth.value "oauth2" }}{{ $oauth = true }}{{ end }}{{ end }}
+{{- if $oauth }}
+outgoing = {{ if eq $defaultFields.smtp_encryption.value "tls" }}smtps{{ else }}smtp{{ end }}+xoauth2://{{ $defaultItem.login.username | urlquery }}@{{ $defaultFields.smtp_host.value }}:{{ $defaultFields.smtp_port.value }}
 outgoing-cred-cmd = {{ $.chezmoi.homeDir }}/.local/bin/mutt_oauth2.py {{ $.chezmoi.homeDir }}/.local/state/email/{{ $defaultItem.login.username }}.tokens
 {{- else }}
 outgoing = {{ if eq $defaultFields.smtp_encryption.value "tls" }}smtps{{ else }}smtp{{ end }}://{{ $defaultItem.login.username | urlquery }}:{{ $defaultPassword | urlquery }}@{{ $defaultFields.smtp_host.value }}:{{ $defaultFields.smtp_port.value }}
@@ -102,8 +104,10 @@ postpone = draft
 {{- else }}
 postpone = Drafts
 {{- end }}
-{{- if or (eq $fields.imap_host.value "outlook.office365.com") (eq $fields.imap_host.value "imap-mail.outlook.com") }}
-outgoing = smtp+xoauth2://{{ $item.login.username | urlquery }}@{{ $fields.smtp_host.value }}:{{ $fields.smtp_port.value }}
+{{- $oauth := or (eq $fields.imap_host.value "outlook.office365.com") (eq $fields.imap_host.value "imap-mail.outlook.com") }}
+{{- if hasKey $fields "auth" }}{{ if eq $fields.auth.value "oauth2" }}{{ $oauth = true }}{{ end }}{{ end }}
+{{- if $oauth }}
+outgoing = {{ if eq $fields.smtp_encryption.value "tls" }}smtps{{ else }}smtp{{ end }}+xoauth2://{{ $item.login.username | urlquery }}@{{ $fields.smtp_host.value }}:{{ $fields.smtp_port.value }}
 outgoing-cred-cmd = {{ $.chezmoi.homeDir }}/.local/bin/mutt_oauth2.py {{ $.chezmoi.homeDir }}/.local/state/email/{{ $item.login.username }}.tokens
 {{- else }}
 outgoing = {{ if eq $fields.smtp_encryption.value "tls" }}smtps{{ else }}smtp{{ end }}://{{ $item.login.username | urlquery }}:{{ $password | urlquery }}@{{ $fields.smtp_host.value }}:{{ $fields.smtp_port.value }}

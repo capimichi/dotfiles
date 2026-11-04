@@ -21,7 +21,9 @@ IMAPAccount {{ $item.login.username }}
 Host {{ $fields.imap_host.value }}
 Port {{ $fields.imap_port.value }}
 User {{ $item.login.username }}
-{{- if or (eq $fields.imap_host.value "outlook.office365.com") (eq $fields.imap_host.value "imap-mail.outlook.com") }}
+{{- $oauth := or (eq $fields.imap_host.value "outlook.office365.com") (eq $fields.imap_host.value "imap-mail.outlook.com") }}
+{{- if hasKey $fields "auth" }}{{ if eq $fields.auth.value "oauth2" }}{{ $oauth = true }}{{ end }}{{ end }}
+{{- if $oauth }}
 AuthMechs XOAUTH2
 PassCmd "{{ $.chezmoi.homeDir }}/.local/bin/mutt_oauth2.py {{ $.chezmoi.homeDir }}/.local/state/email/{{ $item.login.username }}.tokens"
 {{- else }}
@@ -49,7 +51,7 @@ Channel {{ $item.login.username }}
 Far :{{ $item.login.username }}-remote:
 Near :{{ $item.login.username }}-local:
 {{- if eq $fields.imap_host.value "imap.gmail.com" }}
-Patterns * !"[Gmail]/Tutti i messaggi" !"[Gmail]/Importanti" !"[Gmail]/All Mail" !"[Gmail]/Important"
+Patterns * !"[Gmail]/Importanti" !"[Gmail]/Important" !"[Gmail]/Speciali" !"[Gmail]/Starred" !"[Gmail]/Tutti i messaggi" !"[Gmail]/All Mail"
 {{- else }}
 Patterns *
 {{- end }}
