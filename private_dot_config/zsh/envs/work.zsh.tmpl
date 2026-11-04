@@ -6,5 +6,10 @@
 export CF_API_TOKEN="{{ index $cloudflare "API Token" "value" }}"
 export CLOUDFLARE_API_TOKEN="{{ index $cloudflare "API Token" "value" }}"
 
+# ServerPlan SSO (Bitwarden: "cpanel sso.serverplan.com thespace")
+{{- $serverplan := (bitwarden "item" "414f6b1f-e2ce-4ccc-82fb-87078e9c01f4") }}
+export SERVERPLAN_USERNAME="{{ $serverplan.login.username }}"
+export SERVERPLAN_PASSWORD="{{ $serverplan.login.password }}"
+
 # Hostinger API (skill thespace-hostinger) — segreto in XDG config, reso da chezmoi
 export HOSTINGER_API_TOKEN="$(cat "${XDG_CONFIG_HOME:-$HOME/.config}/hostinger/token" 2>/dev/null)"
