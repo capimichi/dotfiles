@@ -21,3 +21,9 @@ export HOSTINGER_API_TOKEN="$(cat "${XDG_CONFIG_HOME:-$HOME/.config}/hostinger/t
 # Todoist API (Bitwarden: "app.todoist.com michele.capicchioni@thespacesm.com")
 {{- $todoist := (bitwardenFields "item" "0e286434-44de-452c-b491-580799b70ad3") }}
 export TODOIST_API_TOKEN="{{ index $todoist "APIKEY" "value" }}"
+
+# TheSpace Grid API admin (skill thespace-grid-migration) — Bitwarden: "Grid Thespace Email manage-grid-thespace.thespacesm.com"
+{{- $grid := (bitwarden "item" "56a48462-1485-4b74-b743-cf015fd5ff08") }}
+export GRID_URL="{{ (index (bitwardenFields "item" "56a48462-1485-4b74-b743-cf015fd5ff08") "api_url").value }}"
+export GRID_USERNAME="{{ $grid.login.username }}"
+export GRID_PASSWORD="{{ $grid.login.password }}"
