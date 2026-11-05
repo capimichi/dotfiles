@@ -11,5 +11,13 @@ export CLOUDFLARE_API_TOKEN="{{ index $cloudflare "API Token" "value" }}"
 export SERVERPLAN_USERNAME="{{ $serverplan.login.username }}"
 export SERVERPLAN_PASSWORD="{{ $serverplan.login.password }}"
 
+# Freshdesk API (skill thespace-freshdesk) — Bitwarden: "Freshdesk Ticket Support Thespace"
+{{- $freshdesk := (bitwardenFields "item" "8337d65b-933b-4ad2-95e9-4316630934e3") }}
+export FRESHDESK_API_KEY="{{ index $freshdesk "APIKEY" "value" }}"
+
 # Hostinger API (skill thespace-hostinger) — segreto in XDG config, reso da chezmoi
 export HOSTINGER_API_TOKEN="$(cat "${XDG_CONFIG_HOME:-$HOME/.config}/hostinger/token" 2>/dev/null)"
+
+# Todoist API (Bitwarden: "app.todoist.com michele.capicchioni@thespacesm.com")
+{{- $todoist := (bitwardenFields "item" "0e286434-44de-452c-b491-580799b70ad3") }}
+export TODOIST_API_TOKEN="{{ index $todoist "APIKEY" "value" }}"
