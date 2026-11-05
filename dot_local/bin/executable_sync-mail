@@ -7,15 +7,47 @@ set -euo pipefail
 # Ensure SASL plugin path is set for XOAUTH2 (Hotmail, Outlook, Office365)
 export SASL_PATH="${SASL_PATH:-$HOME/.local/lib/sasl2:/usr/lib/sasl2}"
 
+TARGET="${1:-all}"
+
+# ------------------------------------------------------------------------------
+# Logging (XDG): $XDG_STATE_HOME/sync-mail/sync-mail.log
+# ------------------------------------------------------------------------------
+# Every run logs start/end, the duration and exit code of each step, the output
+# of mbsync/notmuch, runs skipped because another sync holds the lock (with the
+# holder's pid and age) and termination by signal (e.g. aerc's check-mail-timeout).
+LOG_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/sync-mail"
+LOG_FILE="$LOG_DIR/sync-mail.log"
+HOLDER_FILE="$LOG_DIR/running"
+LOG_MAX_BYTES=$((2 * 1024 * 1024))
+mkdir -p "$LOG_DIR"
+if [ -f "$LOG_FILE" ] && [ "$(stat -f %z "$LOG_FILE")" -gt "$LOG_MAX_BYTES" ]; then
+    mv -f "$LOG_FILE" "$LOG_FILE.1"
+fi
+
+log() {
+    printf '%s [%s] %s: %s\n' "$(date '+%F %T')" "$$" "$TARGET" "$*" >>"$LOG_FILE"
+}
+
+log_skip() {
+    local hpid="?" htarget="?" hstart="" age="?"
+    if [ -r "$HOLDER_FILE" ]; then
+        read -r hpid htarget hstart <"$HOLDER_FILE" || true
+        [ -n "$hstart" ] && age="$(($(date +%s) - hstart))s"
+    fi
+    log "skip: sync gia in corso (pid $hpid, target $htarget, da $age)"
+}
+
 # ------------------------------------------------------------------------------
 # Kernel-level File Descriptor Lock via flock
 # ------------------------------------------------------------------------------
 # Automatically released by the OS kernel if process finishes, crashes, or is killed.
 LOCK_FILE="/tmp/mail-sync.lock"
+SHLOCK_FILE=""
 if command -v flock >/dev/null 2>&1; then
     exec 9>"$LOCK_FILE"
     if ! flock -n 9; then
         # Another sync is actively in progress, exit quietly
+        log_skip
         exit 0
     fi
 elif command -v shlock >/dev/null 2>&1; then
@@ -23,21 +55,67 @@ elif command -v shlock >/dev/null 2>&1; then
     # processes are detected automatically. Separate file from the flock one.
     SHLOCK_FILE="/tmp/mail-sync.shlock"
     if ! shlock -f "$SHLOCK_FILE" -p $$; then
+        log_skip
         exit 0
     fi
-    trap 'rm -f "$SHLOCK_FILE"' EXIT
 else
     echo "sync-mail: no flock or shlock available, syncing without lock" >&2
+    log "warning: no flock or shlock available, syncing without lock"
 fi
+
+# ------------------------------------------------------------------------------
+# Run bookkeeping: holder file, exit and signal traps
+# ------------------------------------------------------------------------------
+CHILD=""
+echo "$$ $TARGET $(date +%s)" >"$HOLDER_FILE"
+
+on_exit() {
+    local rc=$?
+    log "end rc=$rc in ${SECONDS}s"
+    rm -f "$HOLDER_FILE"
+    [ -n "$SHLOCK_FILE" ] && rm -f "$SHLOCK_FILE"
+    return 0
+}
+on_signal() {
+    log "ricevuto SIG$1 durante ${STEP:-?} (dopo ${SECONDS}s), termino"
+    [ -n "$CHILD" ] && kill "$CHILD" 2>/dev/null
+    exit "$2"
+}
+trap on_exit EXIT
+trap 'on_signal TERM 143' TERM
+trap 'on_signal INT 130' INT
+trap 'on_signal HUP 129' HUP
+
+# Steps run in background + wait, so that a signal interrupts the wait and the
+# trap fires right away instead of after the (possibly hung) child returns.
+run_step() {
+    STEP="$1"; shift
+    local t0=$SECONDS rc=0
+    "$@" >>"$LOG_FILE" 2>&1 &
+    CHILD=$!
+    wait "$CHILD" || rc=$?
+    CHILD=""
+    log "$STEP rc=$rc in $((SECONDS - t0))s"
+    return $rc
+}
+
+log "start"
 
 # ------------------------------------------------------------------------------
 # Synchronization Pipeline
 # ------------------------------------------------------------------------------
-TARGET="${1:-all}"
-mbsync "$TARGET" || true
-notmuch new
-notmuch tag +spam -unread -- 'folder:/Spam/ or folder:/Junk/ or folder:/Bulk/' 2>/dev/null || true
-notmuch tag +trash -unread -- 'folder:/Trash/ or folder:/Deleted/ or folder:/Cestino/' 2>/dev/null || true
+# mbsync can hang forever on a stale Gmail IMAP connection (its own Timeout
+# does not catch it) while holding the lock: cap it, rc=124 in the log = killed.
+MBSYNC_TIMEOUT="${MBSYNC_TIMEOUT:-240}"
+if command -v timeout >/dev/null 2>&1; then
+    run_step mbsync timeout -k 10 "$MBSYNC_TIMEOUT" mbsync "$TARGET" || true
+else
+    log "warning: timeout not found, mbsync runs without a time limit"
+    run_step mbsync mbsync "$TARGET" || true
+fi
+run_step "notmuch new" notmuch new
+run_step "tag spam" notmuch tag +spam -unread -- 'folder:/Spam/ or folder:/Junk/ or folder:/Bulk/' || true
+run_step "tag trash" notmuch tag +trash -unread -- 'folder:/Trash/ or folder:/Deleted/ or folder:/Cestino/' || true
 
 # ------------------------------------------------------------------------------
 # Notify aerc via macOS FSEvents

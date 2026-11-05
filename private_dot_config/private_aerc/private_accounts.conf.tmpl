@@ -42,7 +42,6 @@ multi-file-strategy = act-all
 from = {{ $defaultAcc.displayName | quote }} <{{ $defaultItem.login.username }}>
 source = notmuch://
 query-map = {{ $.chezmoi.homeDir }}/.config/aerc/notmuch-all.map
-check-mail = 5m
 check-mail-cmd = {{ $.chezmoi.homeDir }}/.local/bin/sync-mail all
 check-mail-timeout = 5m
 enable-maildir = true
@@ -86,11 +85,9 @@ source = notmuch://
 maildir-account-path = {{ $item.login.username }}
 enable-maildir = true
 multi-file-strategy = act-all
-check-mail = 2m
 check-mail-cmd = {{ $.chezmoi.homeDir }}/.local/bin/sync-mail {{ $item.login.username }}
 {{- else }}
 source = maildir://{{ $.chezmoi.homeDir }}/.local/share/mail/{{ $item.login.username }}
-check-mail = 5m
 check-mail-cmd = mbsync {{ $item.login.username }}
 {{- end }}
 default = INBOX
