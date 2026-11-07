@@ -47,3 +47,13 @@ export CF_ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID"
 {{- $huggingface := (bitwardenFields "item" "ebc5f808-ebe0-4f1b-8242-b2ac01653d21") }}
 export HF_TOKEN="{{ (index $huggingface "CLI TOKEN").value }}"
 export HUGGING_FACE_HUB_TOKEN="$HF_TOKEN"
+
+# Worldfilia (Bitwarden: "portal.worldfilia.net")
+{{- $worldfilia := (bitwarden "item" "ecf3eeb9-c22c-4157-a028-b15d014f4cc2") }}
+export WORLDFILIA_USERNAME="{{ $worldfilia.login.username }}"
+export WORLDFILIA_PASSWORD="{{ $worldfilia.login.password }}"
+{{- if and (hasKey $worldfilia.login "totp") $worldfilia.login.totp }}
+export WORLDFILIA_TOTP_SECRET="{{ $worldfilia.login.totp }}"
+{{- end }}
+
+
