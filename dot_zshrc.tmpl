@@ -34,6 +34,11 @@ export MPLCONFIGDIR="$XDG_CONFIG_HOME/matplotlib"
 export MITMPROXY_PATH="$XDG_CONFIG_HOME/mitmproxy"
 export VIMINIT='let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC'
 export W3M_DIR="$XDG_DATA_HOME/w3m"
+export GOPATH="$XDG_DATA_HOME/go"
+export STREAMLIT_CONFIG_DIR="$XDG_CONFIG_HOME/streamlit"
+export WDM_CACHE_PATH="$XDG_CACHE_HOME/wdm"
+export WP_CLI_CACHE_DIR="$XDG_CACHE_HOME/wp-cli"
+export WPSCAN_USER_DIR="$XDG_DATA_HOME/wpscan"
 
 # AI / Machine Learning Caches
 export HF_HOME="$XDG_CACHE_HOME/huggingface"
@@ -58,8 +63,7 @@ export PATH="$HOME/.local/bin:$HOME/.venv/bin:$PATH"
 [[ -d "$BUN_INSTALL/bin" ]] && export PATH="$PATH:$BUN_INSTALL/bin"
 export PATH="$PATH:$HOME/miniconda3/bin"
 export PATH="$PATH:$HOME/bentosdk/bin"
-export PATH="$PATH:$HOME/N_m3u8DL-RE/bin"
-export PATH="$PATH:$HOME/go/bin"
+[[ -d "$GOPATH/bin" ]] && export PATH="$PATH:$GOPATH/bin"
 
 # Docker Desktop (macOS)
 [[ -d "/Applications/Docker.app/Contents/Resources/bin" ]] && export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin"
