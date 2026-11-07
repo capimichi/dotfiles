@@ -50,8 +50,13 @@ export HUGGING_FACE_HUB_TOKEN="$HF_TOKEN"
 
 # Worldfilia (Bitwarden: "portal.worldfilia.net")
 {{- $worldfilia := (bitwarden "item" "ecf3eeb9-c22c-4157-a028-b15d014f4cc2") }}
+{{- $worldfiliaFields := (bitwardenFields "item" "ecf3eeb9-c22c-4157-a028-b15d014f4cc2") }}
 export WORLDFILIA_USERNAME="{{ $worldfilia.login.username }}"
 export WORLDFILIA_PASSWORD="{{ $worldfilia.login.password }}"
+{{- if hasKey $worldfiliaFields "APIKEY" }}
+export WORLDFILIA_API_KEY="{{ (index $worldfiliaFields "APIKEY").value }}"
+export WORLDFILIA_TOKEN="$WORLDFILIA_API_KEY"
+{{- end }}
 {{- if and (hasKey $worldfilia.login "totp") $worldfilia.login.totp }}
 export WORLDFILIA_TOTP_SECRET="{{ $worldfilia.login.totp }}"
 {{- end }}
