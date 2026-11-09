@@ -61,4 +61,12 @@ export WORLDFILIA_TOKEN="$WORLDFILIA_API_KEY"
 export WORLDFILIA_TOTP_SECRET="{{ $worldfilia.login.totp }}"
 {{- end }}
 
+# Discord (Bitwarden: "discord.com capimichi")
+{{- $discord := (bitwardenFields "item" "d386ec17-5a1c-4da6-81a3-b3e300ccb381") }}
+export DISCORD_BOT_TOKEN="{{ (index $discord "BOTTOKEN").value }}"
+export DISCORD_TOKEN="$DISCORD_BOT_TOKEN"
+export DISCORD_APPLICATION_ID="{{ (index $discord "APPID").value }}"
+export DISCORD_APP_ID="$DISCORD_APPLICATION_ID"
+export DISCORD_CLIENT_ID="$DISCORD_APPLICATION_ID"
+export DISCORD_PUBLIC_KEY="{{ (index $discord "PUBLICKEY").value }}"
 

@@ -19,7 +19,6 @@ export IPYTHONDIR="$XDG_CONFIG_HOME/ipython"
 export JUPYTER_CONFIG_DIR="$XDG_CONFIG_HOME/jupyter"
 export MPLCONFIGDIR="$XDG_CONFIG_HOME/matplotlib"
 export MITMPROXY_PATH="$XDG_CONFIG_HOME/mitmproxy"
-export VIMINIT='let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC'
 export W3M_DIR="$XDG_DATA_HOME/w3m"
 export GOPATH="$XDG_DATA_HOME/go"
 export STREAMLIT_CONFIG_DIR="$XDG_CONFIG_HOME/streamlit"
