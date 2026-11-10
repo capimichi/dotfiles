@@ -23,6 +23,8 @@ README.md
 .config/himalaya
 .config/himalaya/**
 .config/isyncrc
+.config/ansible
+.config/ansible/**
 {{ end }}
 
 {{ if ne .chezmoi.os "darwin" }}
