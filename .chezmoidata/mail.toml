@@ -19,7 +19,8 @@ accounts = [
 
 [mail.work]
 accounts = [
-  { id = "a62f775f-5199-4ceb-9a83-eb6f4ca618ce", default = true, displayName = "Michele Capicchioni" }
+  { id = "a62f775f-5199-4ceb-9a83-eb6f4ca618ce", default = true, displayName = "Michele Capicchioni" },
+  { id = "1bc2d891-e86a-47a7-9069-37ba24a15265", default = false, displayName = "Hostmaster" }
 ]
 
 [mail.server]
