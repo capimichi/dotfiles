@@ -42,3 +42,8 @@ export OLLAMA_MODELS="$XDG_DATA_HOME/ollama/models"
 
 # Cyrus SASL Plugin Path (for mbsync XOAUTH2 support)
 export SASL_PATH="$HOME/.local/lib/sasl2:/usr/lib/sasl2"
+
+# Variabili locali non versionate, visibili anche alle shell non interattive (es. BW_SESSION)
+if [[ -f "$HOME/.zshenv.local" ]]; then
+    source "$HOME/.zshenv.local"
+fi
