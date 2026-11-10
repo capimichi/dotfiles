@@ -40,7 +40,7 @@ All'inizializzazione (`chezmoi init`), un prompt interattivo memorizza l'ambient
 
 * Nessun token, password o chiave privata viene mai committato nel repository pubblico.
 * I segreti personali vengono iniettati compilando template Chezmoi interrogando Bitwarden CLI (`bw`).
-* I file temporanei e le sessioni locali risiedono in `~/.zshrc.local` (escluso esplicitamente da `.chezmoiignore`).
+* Le variabili locali non versionate (es. `BW_SESSION`) risiedono in `~/.zshenv.local`, letto da ogni zsh anche non interattiva; le configurazioni locali della shell interattiva in `~/.zshrc.local`. Entrambi esclusi esplicitamente da `.chezmoiignore`.
 
 ---
 

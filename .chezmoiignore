@@ -4,6 +4,7 @@ README.md
 !.local
 !.local/**
 .zshrc.local
+.zshenv.local
 .gitconfig.local
 
 {{ if ne .environment "personal" }}
