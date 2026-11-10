@@ -25,6 +25,8 @@ README.md
 .config/isyncrc
 .config/ansible
 .config/ansible/**
+.config/google-tasks
+.config/google-tasks/**
 {{ end }}
 
 {{ if ne .chezmoi.os "darwin" }}
