@@ -14,6 +14,7 @@ export SERVERPLAN_PASSWORD="{{ $serverplan.login.password }}"
 # Freshdesk API (skill thespace-freshdesk) — Bitwarden: "Freshdesk Ticket Support Thespace"
 {{- $freshdesk := (bitwardenFields "item" "8337d65b-933b-4ad2-95e9-4316630934e3") }}
 export FRESHDESK_API_KEY="{{ index $freshdesk "APIKEY" "value" }}"
+export FRESHDESK_DOMAIN="thespace.freshdesk.com"
 
 # Hostinger API (skill thespace-hostinger) — segreto in XDG config, reso da chezmoi
 export HOSTINGER_API_TOKEN="$(cat "${XDG_CONFIG_HOME:-$HOME/.config}/hostinger/token" 2>/dev/null)"
