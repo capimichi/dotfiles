@@ -70,3 +70,9 @@ export DISCORD_APP_ID="$DISCORD_APPLICATION_ID"
 export DISCORD_CLIENT_ID="$DISCORD_APPLICATION_ID"
 export DISCORD_PUBLIC_KEY="{{ (index $discord "PUBLICKEY").value }}"
 
+# TickTick API (Bitwarden: "ticktick.com")
+{{- $ticktick := (bitwardenFields "item" "a4415a3a-3795-4a01-ae6e-b501006a3492") }}
+export TICKTICK_API_KEY="{{ (index $ticktick "APIKEY").value }}"
+export TICKTICK_TOKEN="$TICKTICK_API_KEY"
+export TICKTICK_API_TOKEN="$TICKTICK_API_KEY"
+
