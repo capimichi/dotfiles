@@ -99,6 +99,23 @@ run_step() {
     return $rc
 }
 
+# Run from a terminal: mbsync keeps stdout on the screen, so it prints its
+# progress counters (it only does so when stdout is a TTY); errors and warnings
+# go both to the screen and to the log. From aerc (no TTY) nothing changes.
+run_step_tty() {
+    STEP="$1"; shift
+    local t0=$SECONDS rc=0
+    "$@" 2> >(tee -a "$LOG_FILE" >&2) &
+    CHILD=$!
+    wait "$CHILD" || rc=$?
+    CHILD=""
+    log "$STEP rc=$rc in $((SECONDS - t0))s"
+    return $rc
+}
+
+MBSYNC_STEP=run_step
+[ -t 1 ] && MBSYNC_STEP=run_step_tty
+
 log "start"
 
 # ------------------------------------------------------------------------------
@@ -108,10 +125,10 @@ log "start"
 # does not catch it) while holding the lock: cap it, rc=124 in the log = killed.
 MBSYNC_TIMEOUT="${MBSYNC_TIMEOUT:-240}"
 if command -v timeout >/dev/null 2>&1; then
-    run_step mbsync timeout -k 10 "$MBSYNC_TIMEOUT" mbsync "$TARGET" || true
+    "$MBSYNC_STEP" mbsync timeout -k 10 "$MBSYNC_TIMEOUT" mbsync "$TARGET" || true
 else
     log "warning: timeout not found, mbsync runs without a time limit"
-    run_step mbsync mbsync "$TARGET" || true
+    "$MBSYNC_STEP" mbsync mbsync "$TARGET" || true
 fi
 run_step "notmuch new" notmuch new
 run_step "tag spam" notmuch tag +spam -unread -- 'folder:/Spam/ or folder:/Junk/ or folder:/Bulk/' || true

@@ -6,6 +6,7 @@
 
 {{- range $acc := $mailConfig.accounts }}
 {{- $item := (bitwarden "item" $acc.id) }}
+{{- $pushOnly := list }}{{ if hasKey $acc "pushOnly" }}{{ $pushOnly = $acc.pushOnly }}{{ end }}
 {{- $fields := (bitwardenFields "item" $acc.id) }}
 {{- $password := $item.login.password }}
 {{- if hasKey $fields "app_password" }}
@@ -55,10 +56,25 @@ Patterns * !"[Gmail]/Importanti" !"[Gmail]/Important" !"[Gmail]/Speciali" !"[Gma
 {{- else }}
 Patterns *
 {{- end }}
+{{- range $box := $pushOnly }} !{{ $box | quote }}{{ end }}
 Create Both
 Expunge Both
 CopyArrivalDate yes
 SyncState *
+{{- if $pushOnly }}
+
+# pushOnly: folders synced Mac -> server only. Moves made from aerc reach the
+# server, messages the server puts there itself (cron mail, spam) are not downloaded.
+Channel {{ $item.login.username }}-push
+Far :{{ $item.login.username }}-remote:
+Near :{{ $item.login.username }}-local:
+Patterns{{ range $box := $pushOnly }} {{ $box | quote }}{{ end }}
+Sync Push
+Create Near
+Expunge Both
+CopyArrivalDate yes
+SyncState *
+{{- end }}
 
 {{- end }}
 
@@ -68,5 +84,9 @@ SyncState *
 Group all
 {{- range $acc := $mailConfig.accounts }}
 {{- $item := (bitwarden "item" $acc.id) }}
+{{- $pushOnly := list }}{{ if hasKey $acc "pushOnly" }}{{ $pushOnly = $acc.pushOnly }}{{ end }}
 Channel {{ $item.login.username }}
+{{- if $pushOnly }}
+Channel {{ $item.login.username }}-push
+{{- end }}
 {{- end }}
