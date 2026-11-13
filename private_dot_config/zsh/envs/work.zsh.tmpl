@@ -28,3 +28,10 @@ export TODOIST_API_TOKEN="{{ index $todoist "APIKEY" "value" }}"
 export THESPACE_GRID_URL="{{ (index (bitwardenFields "item" "56a48462-1485-4b74-b743-cf015fd5ff08") "api_url").value }}"
 export THESPACE_GRID_USERNAME="{{ $grid.login.username }}"
 export THESPACE_GRID_PASSWORD="{{ $grid.login.password }}"
+
+# Jarvis Lead Intelligence — Bitwarden: "Jarvis — Lead Intelligence (michele.capicchioni@thespacesm.com)"
+# password cifrata con age (campo password_age), chiave locale ~/.config/chezmoi/key.txt
+{{- $jarvis := (bitwarden "item" "ba7e9a71-d69d-4033-94b8-b9275ea437a1") }}
+export JARVIS_URL="{{ (index $jarvis.login.uris 0).uri | replace "/login" "" }}"
+export JARVIS_USERNAME="{{ $jarvis.login.username }}"
+export JARVIS_PASSWORD="{{ (index (bitwardenFields "item" "ba7e9a71-d69d-4033-94b8-b9275ea437a1") "password_age").value | b64dec | decrypt }}"
