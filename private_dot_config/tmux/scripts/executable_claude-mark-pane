@@ -1,0 +1,6 @@
+#!/bin/bash
+# Claude Code SessionStart hook: registra l'id sessione sul pannello tmux corrente
+[ -n "$TMUX_PANE" ] || exit 0
+id=$(jq -r '.session_id // empty')
+[ -n "$id" ] && tmux set-option -p -t "$TMUX_PANE" @claude_session "$id"
+exit 0

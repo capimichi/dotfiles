@@ -1,0 +1,19 @@
+#!/bin/bash
+# Lanciato da tmux-resurrect al ripristino: riapre la sessione Claude di questo pannello
+key=$(tmux display-message -p -t "$TMUX_PANE" '#{session_name}:#{window_index}.#{pane_index}')
+id=$(awk -v k="$key" '$1==k {print $2}' "$HOME/.local/share/tmux/resurrect/claude_sessions" 2>/dev/null)
+# togli eventuali --continue/--resume dagli argomenti originali
+args=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -c|--continue) ;;
+    -r|--resume) [[ "${2:-}" != -* ]] && shift ;;
+    --resume=*) ;;
+    *) args+=("$1") ;;
+  esac
+  shift
+done
+if [ -n "$id" ] && ls "$HOME"/.claude/projects/*/"$id".jsonl >/dev/null 2>&1; then
+  exec claude --resume "$id" "${args[@]}"
+fi
+exec claude "${args[@]}"
