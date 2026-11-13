@@ -23,6 +23,10 @@ export HOSTINGER_API_TOKEN="$(cat "${XDG_CONFIG_HOME:-$HOME/.config}/hostinger/t
 {{- $todoist := (bitwardenFields "item" "0e286434-44de-452c-b491-580799b70ad3") }}
 export TODOIST_API_TOKEN="{{ index $todoist "APIKEY" "value" }}"
 
+# TickTick API (Bitwarden: "ticktick.com michele.capicchioni@thespacesm.com")
+{{- $ticktick := (bitwardenFields "item" "f4483b64-ee7e-4e66-8f0e-3d82bb0f0867") }}
+export TICKTICK_APIKEY="{{ index $ticktick "APIKEY" "value" }}"
+
 # TheSpace Grid API admin (skill thespace-grid-migration) — Bitwarden: "Grid Thespace Email manage-grid-thespace.thespacesm.com"
 {{- $grid := (bitwarden "item" "56a48462-1485-4b74-b743-cf015fd5ff08") }}
 export THESPACE_GRID_URL="{{ (index (bitwardenFields "item" "56a48462-1485-4b74-b743-cf015fd5ff08") "api_url").value }}"
