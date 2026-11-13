@@ -76,4 +76,8 @@ export DISCORD_PUBLIC_KEY="{{ (index $discord "PUBLICKEY").value }}"
 # TickTick API (Bitwarden: "ticktick.com")
 {{- $ticktick := (bitwardenFields "item" "a4415a3a-3795-4a01-ae6e-b501006a3492") }}
 export TICKTICK_APIKEY="{{ index $ticktick "APIKEY" "value" }}"
+export TICKTICK_API_KEY="$TICKTICK_APIKEY"
+export TICKTICK_TOKEN="$TICKTICK_APIKEY"
+export TICKTICK_API_TOKEN="$TICKTICK_APIKEY"
+export TICKTICK_CLI="$SKILL_PROJECT_PATH/ticktick/scripts/ticktick_cli.py"
 
