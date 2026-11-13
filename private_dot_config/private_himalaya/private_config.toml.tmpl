@@ -55,4 +55,12 @@ smtp.sasl.xoauth2.token.command = {{ $tokenCmd }}
 smtp.sasl.plain.authcid = {{ $item.login.username | quote }}
 smtp.sasl.plain.passwd.raw = {{ $password | quote }}
 {{- end }}
+{{- if eq $fields.imap_host.value "imap.gmail.com" }}
+
+# Gmail IMAP does not expose mailbox roles: map them by name
+mailbox.alias.sent = "[Gmail]/Posta inviata"
+mailbox.alias.drafts = "[Gmail]/Bozze"
+mailbox.alias.trash = "[Gmail]/Cestino"
+message.send.save-copy = true
+{{- end }}
 {{- end }}
