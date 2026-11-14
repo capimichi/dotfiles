@@ -3,7 +3,8 @@
 # ==============================================================================
 
 # Cartella del repo skill (usata nei SKILL.md al posto dei percorsi assoluti)
-export SKILL_PROJECT_PATH="$HOME/workspace/capimichi-skills"
+export USER_SKILLS_DIR="$HOME/workspace/capimichi-skills"
+export SKILL_PROJECT_PATH="$USER_SKILLS_DIR"
 # Paperless-ngx (Bitwarden: "paperless.michelecapicchioni.com capimichi")
 {{- $paperless := (bitwardenFields "item" "28152e5c-412c-4eb6-a569-b30e011c9890") }}
 export PAPERLESS_BASE_URL="{{ $paperless.base_url.value }}"
@@ -76,5 +77,5 @@ export DISCORD_PUBLIC_KEY="{{ (index $discord "PUBLICKEY").value }}"
 # TickTick API (Bitwarden: "ticktick.com")
 {{- $ticktick := (bitwardenFields "item" "a4415a3a-3795-4a01-ae6e-b501006a3492") }}
 export TICKTICK_APIKEY="{{ index $ticktick "APIKEY" "value" }}"
-export TICKTICK_CLI="$SKILL_PROJECT_PATH/ticktick/scripts/ticktick_cli.py"
+export TICKTICK_CLI="$USER_SKILLS_DIR/ticktick/scripts/ticktick_cli.py"
 
