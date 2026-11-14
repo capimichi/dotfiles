@@ -79,3 +79,13 @@ export DISCORD_PUBLIC_KEY="{{ (index $discord "PUBLICKEY").value }}"
 export TICKTICK_APIKEY="{{ index $ticktick "APIKEY" "value" }}"
 export TICKTICK_CLI="$USER_SKILLS_DIR/ticktick/scripts/ticktick_cli.py"
 
+# LubeLogger (Bitwarden: "lubelogger.michelecapicchioni.com")
+{{- $lubelogger := (bitwarden "item" "9be82328-e3f7-4be4-8932-b50201308e46") }}
+{{- $lubeloggerFields := (bitwardenFields "item" "9be82328-e3f7-4be4-8932-b50201308e46") }}
+export LUBELOGGER_BASE_URL="https://lubelogger.michelecapicchioni.com"
+export LUBELOGGER_URL="$LUBELOGGER_BASE_URL"
+export LUBELOGGER_APIKEY="{{ index $lubeloggerFields "APIKEY" "value" }}"
+export LUBELOGGER_API_KEY="$LUBELOGGER_APIKEY"
+export LUBELOGGER_USERNAME="{{ $lubelogger.login.username }}"
+export LUBELOGGER_PASSWORD="{{ $lubelogger.login.password }}"
+
