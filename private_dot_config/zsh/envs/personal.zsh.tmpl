@@ -88,3 +88,27 @@ export LUBELOGGER_API_KEY="$LUBELOGGER_APIKEY"
 export LUBELOGGER_USERNAME="{{ $lubelogger.login.username }}"
 export LUBELOGGER_PASSWORD="{{ $lubelogger.login.password }}"
 
+# Profilo Personale & Anagrafica (Bitwarden: "Profilo - Michele Capicchioni")
+{{- $profile := (bitwardenFields "item" "4587a9a0-e510-4e9d-8e4e-b506011f32cd") }}
+export PERSONAL_FIRST_NAME="{{ index $profile "first_name" "value" }}"
+export PERSONAL_LAST_NAME="{{ index $profile "last_name" "value" }}"
+export PERSONAL_BIRTH_DATE="{{ index $profile "birth_date" "value" }}"
+export PERSONAL_PHONE="{{ index $profile "phone" "value" }}"
+export PERSONAL_EMAIL="{{ index $profile "email" "value" }}"
+export PERSONAL_FISCAL_CODE="{{ index $profile "fiscal_code" "value" }}"
+export PERSONAL_DRIVER_LICENSE_NUMBER="{{ index $profile "driver_license_number" "value" }}"
+export PERSONAL_DRIVER_LICENSE="$PERSONAL_DRIVER_LICENSE_NUMBER"
+export PERSONAL_DRIVER_LICENSE_EXPIRY="{{ index $profile "driver_license_expiry" "value" }}"
+export PERSONAL_ISS_CODE="{{ index $profile "iss_code" "value" }}"
+export PERSONAL_DOCTOR="{{ index $profile "doctor" "value" }}"
+
+# Eredità ISS San Marino
+export ISS_CODE="$PERSONAL_ISS_CODE"
+export ISS_DOCTOR="$PERSONAL_DOCTOR"
+export ISS_FIRST_NAME="$PERSONAL_FIRST_NAME"
+export ISS_LAST_NAME="$PERSONAL_LAST_NAME"
+export ISS_BIRTH_DATE="$PERSONAL_BIRTH_DATE"
+export ISS_PHONE="$PERSONAL_PHONE"
+export ISS_EMAIL="$PERSONAL_EMAIL"
+export ISS_FISCAL_CODE="$PERSONAL_FISCAL_CODE"
+
