@@ -2,6 +2,10 @@
 # Qui solo variabili d'ambiente; PATH resta in .zprofile/.zshrc perche' su macOS
 # /etc/zprofile (path_helper) lo riordinerebbe.
 
+# PATH come array unico: deduplica i doppi prepend di .zprofile e .zshrc
+# mantenendo la prima occorrenza (ordine preservato).
+typeset -U PATH path
+
 # XDG Base Directory Specification
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
