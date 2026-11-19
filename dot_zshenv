@@ -43,6 +43,15 @@ export OLLAMA_MODELS="$XDG_DATA_HOME/ollama/models"
 # Cyrus SASL Plugin Path (for mbsync XOAUTH2 support)
 export SASL_PATH="$HOME/.local/lib/sasl2:/usr/lib/sasl2"
 
+# Environment-specific Configurations (personal / work)
+if [[ -d "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/envs" ]]; then
+    for env_file in "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/envs"/*.zsh; do
+        if [[ -f "$env_file" ]]; then
+            source "$env_file"
+        fi
+    done
+fi
+
 # Variabili locali non versionate, visibili anche alle shell non interattive (es. BW_SESSION)
 if [[ -f "$HOME/.zshenv.local" ]]; then
     source "$HOME/.zshenv.local"

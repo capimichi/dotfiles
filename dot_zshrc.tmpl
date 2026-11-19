@@ -36,17 +36,6 @@ fi
 [[ -d "$HOME/.antigravity-ide/antigravity-ide/bin" ]] && export PATH="$HOME/.antigravity-ide/antigravity-ide/bin:$PATH"
 
 # ==============================================================================
-# Environment-specific Configurations (personal / work)
-# ==============================================================================
-if [[ -d "$HOME/.config/zsh/envs" ]]; then
-    for env_file in "$HOME/.config/zsh/envs"/*.zsh; do
-        if [[ -f "$env_file" ]]; then
-            source "$env_file"
-        fi
-    done
-fi
-
-# ==============================================================================
 # Completions & Shell Features
 # ==============================================================================
 [[ -d "$HOME/.config/zsh/functions" ]] && fpath=("$HOME/.config/zsh/functions" $fpath)
