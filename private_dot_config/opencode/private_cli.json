@@ -6,10 +6,13 @@
   "session": {
     "sidebar": "hide",
     "scrollbar": false,
-    "thinking": "hide"
+    "thinking": "show"
   },
   "tabs": {
     "mode": "off"
   },
-  "animations": true
+  "animations": true,
+  "theme": {
+    "name": "system"
+  }
 }
