@@ -102,6 +102,10 @@ export PERSONAL_DRIVER_LICENSE_EXPIRY="{{ index $profile "driver_license_expiry"
 export PERSONAL_ISS_CODE="{{ index $profile "iss_code" "value" }}"
 export PERSONAL_DOCTOR="{{ index $profile "doctor" "value" }}"
 
+# DeepRelay API (Bitwarden: "deeprelay.ai")
+{{- $deeprelay := (bitwardenFields "item" "200fb5fa-03d1-405e-88ab-b50800d65e9d") }}
+export DEEPRELAY_API_KEY="{{ (index $deeprelay "APIKEY").value }}"
+
 # Eredità ISS San Marino
 export ISS_CODE="$PERSONAL_ISS_CODE"
 export ISS_DOCTOR="$PERSONAL_DOCTOR"
