@@ -6,7 +6,9 @@
   "session": {
     "sidebar": "hide",
     "scrollbar": false,
-    "thinking": "show"
+    "thinking": "show",
+    "verbosity": "medium",
+    "image_preview": true
   },
   "tabs": {
     "mode": "off"
@@ -14,5 +16,11 @@
   "animations": true,
   "theme": {
     "name": "system"
+  },
+  "prompt": {
+    "paste": "compact"
+  },
+  "attention": {
+    "notifications": true
   }
 }
