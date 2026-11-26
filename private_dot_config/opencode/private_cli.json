@@ -6,9 +6,10 @@
   "session": {
     "sidebar": "hide",
     "scrollbar": false,
-    "thinking": "show",
+    "thinking": "hide",
     "verbosity": "medium",
-    "image_preview": true
+    "image_preview": true,
+    "grouping": "auto"
   },
   "tabs": {
     "mode": "off"
