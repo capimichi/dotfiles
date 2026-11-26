@@ -49,3 +49,7 @@ export THESPACE_GRID_PASSWORD="{{ $grid.login.password }}"
 export JARVIS_URL="{{ (index $jarvis.login.uris 0).uri | replace "/login" "" }}"
 export JARVIS_USERNAME="{{ $jarvis.login.username }}"
 export JARVIS_PASSWORD="{{ (index (bitwardenFields "item" "ba7e9a71-d69d-4033-94b8-b9275ea437a1") "password_age").value | b64dec | decrypt }}"
+
+# OpenAI Admin API (Bitwarden: "OpenAI Admin Key per MICHELE LLM")
+{{- $openai := (bitwardenFields "item" "9ccb3ab9-1768-446b-9e69-2731243244fb") }}
+export OPENAI_ADMIN_KEY="{{ index $openai "Admin Key" "value" }}"
