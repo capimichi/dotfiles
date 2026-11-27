@@ -21,6 +21,12 @@ default = true
 {{- end }}
 email = {{ $item.login.username | quote }}
 display-name = {{ $acc.displayName | quote }}
+{{- /* Plain-text signature used by message write/reply/forward, only if the account has one in signatures/ */}}
+{{- $sigSrc := joinPath $.chezmoi.sourceDir "private_dot_config/private_himalaya/signatures" (printf "%s.txt" $item.login.username) }}
+{{- if stat $sigSrc }}
+signature = {{ include $sigSrc | trimSuffix "\n" | toJson }}
+signature-delim = "-- \n"
+{{- end }}
 
 {{- $oauth := or (eq $fields.imap_host.value "outlook.office365.com") (eq $fields.imap_host.value "imap-mail.outlook.com") }}
 {{- if hasKey $fields "auth" }}{{ if eq $fields.auth.value "oauth2" }}{{ $oauth = true }}{{ end }}{{ end }}
